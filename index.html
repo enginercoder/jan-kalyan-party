@@ -27,6 +27,104 @@
 
   <style>
     /* ---- Page-specific styles ---- */
+
+    /* ---- About Photo Slider ---- */
+    .about-slider-wrap {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      background: var(--gray-200);
+      aspect-ratio: 6 / 5;
+      max-width: 100%;
+      user-select: none;
+    }
+    .about-slider-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+    .about-slide {
+      min-width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-slide img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+    .about-slide:hover img { transform: scale(1.04); }
+    .about-slide-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.70), transparent);
+      padding: 32px 18px 14px;
+      color: white;
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .about-slide-tag {
+      display: inline-block;
+      background: var(--orange);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+    .slider-arrow {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.92);
+      border: none; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 700;
+      cursor: pointer; z-index: 10;
+      transition: all 0.25s ease;
+      color: var(--text-dark);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    }
+    .slider-arrow:hover {
+      background: var(--orange); color: white;
+      transform: translateY(-50%) scale(1.08);
+    }
+    .slider-arrow.prev { left: 12px; }
+    .slider-arrow.next { right: 12px; }
+    .slider-dots {
+      position: absolute;
+      bottom: 12px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 10;
+    }
+    .slider-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.50);
+      border: none; cursor: pointer; padding: 0;
+      transition: all 0.25s ease;
+    }
+    .slider-dot.active {
+      background: white;
+      width: 20px; border-radius: 4px;
+    }
+    .slider-counter {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: rgba(0,0,0,0.45);
+      color: white; font-size: 0.72rem; font-weight: 600;
+      padding: 4px 10px; border-radius: 50px;
+      z-index: 10; backdrop-filter: blur(4px);
+    }
+
     .values-section { background: var(--gray-100); }
     .values-grid {
       display: grid;
@@ -358,11 +456,67 @@
 <section class="section-pad" id="about">
   <div class="container">
     <div class="about-grid">
-      <!-- Image -->
-      <div class="about-img-card reveal" data-delay="0">
-        <img src="assets/logo.png" alt="Jan Kalyan Party">
-        <div class="about-pill">Est. 2024</div>
-      </div>
+      <!-- Photo Slider -->
+      <div class="about-slider-wrap reveal" data-delay="0" id="about-slider">
+
+        <!-- Counter badge -->
+        <div class="slider-counter">
+          <span id="slide-current">1</span> / <span id="slide-total">5</span>
+        </div>
+
+        <!-- Slide Track -->
+        <div class="about-slider-track" id="slider-track">
+
+          <div class="about-slide">
+            <img src="https://picsum.photos/seed/jkp1/600/500" alt="Jan Kalyan Party Rally">
+            <div class="about-slide-caption">
+              <div class="about-slide-tag">Party Event</div>
+              <div>Jan Kalyan Party public rally — voices for development</div>
+            </div>
+          </div>
+
+          <div class="about-slide">
+            <img src="https://picsum.photos/seed/jkp2/600/500" alt="Party President">
+            <div class="about-slide-caption">
+              <div class="about-slide-tag">Leadership</div>
+              <div>Mr. Lal Bahadur Pal addressing party workers</div>
+            </div>
+          </div>
+
+          <div class="about-slide">
+            <img src="https://picsum.photos/seed/jkp3/600/500" alt="Community Work">
+            <div class="about-slide-caption">
+              <div class="about-slide-tag">Community</div>
+              <div>Grassroots outreach and community welfare programme</div>
+            </div>
+          </div>
+
+          <div class="about-slide">
+            <img src="https://picsum.photos/seed/jkp4/600/500" alt="Volunteer Activity">
+            <div class="about-slide-caption">
+              <div class="about-slide-tag">Volunteers</div>
+              <div>JKP volunteers serving the community with dedication</div>
+            </div>
+          </div>
+
+          <div class="about-slide">
+            <img src="https://picsum.photos/seed/jkp5/600/500" alt="Farmers Welfare">
+            <div class="about-slide-caption">
+              <div class="about-slide-tag">Farmers</div>
+              <div>Supporting farmers — because development means everyone</div>
+            </div>
+          </div>
+
+        </div><!-- /track -->
+
+        <!-- Arrows -->
+        <button class="slider-arrow prev" id="slider-prev" aria-label="Previous slide">&#8249;</button>
+        <button class="slider-arrow next" id="slider-next" aria-label="Next slide">&#8250;</button>
+
+        <!-- Dots -->
+        <div class="slider-dots" id="slider-dots"></div>
+
+      </div><!-- /about-slider-wrap -->
 
       <!-- Text -->
       <div class="about-text reveal" data-delay="150">
@@ -782,5 +936,94 @@
 <script src="js/security.js"></script>
 <script src="js/main.js"></script>
 <script src="js/auth.js"></script>
+<script>
+  /* ================================================================
+     ABOUT SECTION PHOTO SLIDER — index.html
+     Auto-play, arrows, dots, touch swipe, keyboard, mouse drag
+     ================================================================ */
+  (function() {
+    const track     = document.getElementById('slider-track');
+    const dotsWrap  = document.getElementById('slider-dots');
+    const prevBtn   = document.getElementById('slider-prev');
+    const nextBtn   = document.getElementById('slider-next');
+    const currentEl = document.getElementById('slide-current');
+    const totalEl   = document.getElementById('slide-total');
+
+    if (!track) return;
+
+    const slides    = track.querySelectorAll('.about-slide');
+    const total     = slides.length;
+    let current     = 0;
+    let autoTimer   = null;
+    let touchStartX = 0;
+    let mouseStartX = 0;
+
+    if (totalEl) totalEl.textContent = total;
+
+    /* ---- Build dots ---- */
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      dot.addEventListener('click', () => { goTo(i); startAuto(); });
+      dotsWrap.appendChild(dot);
+    });
+
+    /* ---- Go to slide ---- */
+    function goTo(index) {
+      current = (index + total) % total;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      if (currentEl) currentEl.textContent = current + 1;
+      dotsWrap.querySelectorAll('.slider-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    /* ---- Auto-play ---- */
+    function startAuto() {
+      stopAuto();
+      autoTimer = setInterval(() => goTo(current + 1), 4000);
+    }
+    function stopAuto() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    }
+
+    /* ---- Arrows ---- */
+    prevBtn?.addEventListener('click', () => { goTo(current - 1); startAuto(); });
+    nextBtn?.addEventListener('click', () => { goTo(current + 1); startAuto(); });
+
+    /* ---- Keyboard ---- */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft')  { goTo(current - 1); startAuto(); }
+      if (e.key === 'ArrowRight') { goTo(current + 1); startAuto(); }
+    });
+
+    /* ---- Touch swipe ---- */
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX; stopAuto();
+    }, { passive: true });
+    track.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) diff > 0 ? goTo(current + 1) : goTo(current - 1);
+      startAuto();
+    }, { passive: true });
+
+    /* ---- Mouse drag ---- */
+    track.addEventListener('mousedown',  (e) => { mouseStartX = e.clientX; stopAuto(); });
+    track.addEventListener('mouseup',    (e) => {
+      const diff = mouseStartX - e.clientX;
+      if (Math.abs(diff) > 50) diff > 0 ? goTo(current + 1) : goTo(current - 1);
+      startAuto();
+    });
+
+    /* ---- Pause on hover ---- */
+    track.addEventListener('mouseenter', stopAuto);
+    track.addEventListener('mouseleave', startAuto);
+
+    /* ---- Start ---- */
+    goTo(0);
+    startAuto();
+  })();
+</script>
 </body>
 </html>
