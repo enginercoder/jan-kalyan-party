@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Join Jan Kalyan Party — Register as General Member, Active Member, or Volunteer and get your official digital ID card.">
+  <meta name="keywords" content="Jan Kalyan Party membership, join JKP, volunteer, member registration">
+  <title>Membership — Jan Kalyan Party</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ---- Membership Type Selector ---- */
+    .mem-type-selector {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 52px;
+    }
+    .mem-type-btn {
+      flex: 1;
+      min-width: 220px;
+      max-width: 300px;
+      padding: 28px 22px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--gray-200);
+      background: var(--white);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      font-family: 'Poppins', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+    .mem-type-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: var(--transition);
+    }
+    .mem-type-btn.general::before  { background: linear-gradient(135deg,var(--blue-pale),white); }
+    .mem-type-btn.active::before   { background: linear-gradient(135deg,var(--orange-pale),white); }
+    .mem-type-btn.volunteer::before{ background: linear-gradient(135deg,#E8F5E9,white); }
+    .mem-type-btn:hover::before,
+    .mem-type-btn.selected::before { opacity: 1; }
+    .mem-type-btn.general.selected,
+    .mem-type-btn.general:hover  { border-color: var(--blue); }
+    .mem-type-btn.active.selected,
+    .mem-type-btn.active:hover   { border-color: var(--orange); }
+    .mem-type-btn.volunteer.selected,
+    .mem-type-btn.volunteer:hover{ border-color: var(--green); }
+    .mem-type-icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .mem-type-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 5px;
+      position: relative;
+      z-index: 1;
+    }
+    .mem-type-desc {
+      font-size: 0.78rem;
+      color: var(--gray-600);
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+    .mem-type-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .general  .mem-type-badge { background: var(--blue-pale);  color: var(--blue); }
+    .active   .mem-type-badge { background: var(--orange-pale);color: var(--orange); }
+    .volunteer.mem-type-badge,
+    .volunteer .mem-type-badge{ background: #E8F5E9; color: var(--green); }
+    .selected-tick {
+      position: absolute;
+      top: 12px; left: 12px;
+      width: 22px; height: 22px;
+      background: var(--orange);
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .mem-type-btn.selected .selected-tick { display: flex; }
+
+    /* ---- Form Panels ---- */
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
+
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .form-card-header {
+      padding: 28px 36px 22px;
+      color: white;
+    }
+    .form-card-header.blue    { background: linear-gradient(135deg,#0D47A1,#1565C0); }
+    .form-card-header.orange  { background: linear-gradient(135deg,#E55A00,#FF6B00); }
+    .form-card-header.green   { background: linear-gradient(135deg,#2E7D32,#388E3C); }
+    .form-card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .form-card-sub {
+      font-size: 0.82rem;
+      opacity: 0.80;
+    }
+    .form-card-body { padding: 32px 36px; }
+
+    /* Password strength bar */
+    .pwd-strength-wrap {
+      margin-top: 6px;
+      height: 4px;
+      background: var(--gray-200);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .pwd-strength-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    .pwd-strength-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    /* Input with icon (password toggle) */
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap .form-control { padding-right: 42px; }
+    .toggle-password {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--gray-400);
+      padding: 0;
+      line-height: 1;
+    }
+
+    /* Benefits banner inside form */
+    .benefits-banner {
+      background: var(--gray-100);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin-bottom: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-mid);
+    }
+    .benefit-item .tick { color: var(--orange); }
+
+    /* Steps indicator */
+    .form-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .form-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      position: relative;
+    }
+    .form-step::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: var(--gray-200);
+    }
+    .form-step:last-child::after { display: none; }
+    .form-step.done::after  { background: var(--orange); }
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--gray-600);
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .form-step.active .step-num {
+      background: var(--orange);
+      color: white;
+    }
+    .form-step.done .step-num {
+      background: var(--green-light);
+      color: white;
+    }
+    .step-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      white-space: nowrap;
+    }
+    .form-step.active .step-label { color: var(--orange); }
+    .form-step.done  .step-label  { color: var(--green-light); }
+
+    /* Benefits section */
+    .benefits-section { background: var(--gray-100); }
+    .benefits-compare {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 24px;
+      margin-top: 50px;
+    }
+    .benefit-col {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .benefit-col-head {
+      padding: 20px 22px;
+      color: white;
+      text-align: center;
+    }
+    .benefit-col.general  .benefit-col-head { background: linear-gradient(135deg,#0D47A1,#1976D2); }
+    .benefit-col.active   .benefit-col-head { background: linear-gradient(135deg,#E55A00,#FF6B00); }
+    .benefit-col.volunteer.benefit-col-head,
+    .benefit-col.volunteer .benefit-col-head{ background: linear-gradient(135deg,#2E7D32,#388E3C); }
+    .benefit-col-title { font-size: 1.05rem; font-weight: 800; }
+    .benefit-col-sub   { font-size: 0.72rem; opacity: 0.80; margin-top: 3px; }
+    .benefit-col-body  { padding: 18px 22px; }
+    .benefit-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.84rem; color: var(--text-mid);
+    }
+    .benefit-row:last-child { border-bottom: none; }
+    .benefit-row .chk { color: var(--orange); font-weight: 700; flex-shrink: 0; }
+    .benefit-row.na   { opacity: 0.38; }
+    .benefit-row.na .chk { color: var(--gray-400); }
+
+    /* FAQ */
+    .faq-list { max-width: 720px; margin: 44px auto 0; }
+    .faq-item {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .faq-question {
+      width: 100%;
+      text-align: left;
+      padding: 16px 20px;
+      background: white;
+      border: none;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition);
+    }
+    .faq-question:hover { background: var(--orange-pale); color: var(--orange); }
+    .faq-question.open  { background: var(--orange); color: white; }
+    .faq-arrow { transition: var(--transition); }
+    .faq-question.open .faq-arrow { transform: rotate(180deg); }
+    .faq-answer {
+      display: none;
+      padding: 14px 20px;
+      font-size: 0.86rem;
+      color: var(--gray-600);
+      line-height: 1.75;
+      background: var(--off-white);
+      border-top: 1px solid var(--gray-200);
+    }
+    .faq-answer.open { display: block; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .benefits-compare { grid-template-columns: 1fr; max-width:360px; margin-inline:auto; }
+    }
+    @media (max-width: 600px) {
+      .form-card-body   { padding: 22px 18px; }
+      .form-card-header { padding: 22px 18px 16px; }
+      .mem-type-btn { min-width: 140px; padding: 20px 14px; }
+      .form-steps   { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ===== TOP BAR ===== -->
+<div class="top-bar">
+  <div class="container top-bar-inner">
+    <div class="top-bar-left">
+      <a href="mailto:jankalyanpartyofficial@gmail.com"><i class="fa fa-envelope"></i> jankalyanpartyofficial@gmail.com</a>
+      <a href="tel:+917376409590"><i class="fa fa-phone"></i> +91 7376409590</a>
+    </div>
+    <div class="top-bar-right">
+      <a href="https://facebook.com/jankalyanparty"  target="_blank" rel="noopener" class="top-bar-social">f</a>
+      <a href="https://twitter.com/jankalyanparty"   target="_blank" rel="noopener" class="top-bar-social">𝕏</a>
+      <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="top-bar-social">in</a>
+      <a href="https://youtube.com/@jankalyanparty"  target="_blank" rel="noopener" class="top-bar-social">▶</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+      <div class="nav-logo-text">
+        <div class="party-name">Jan Kalyan Party</div>
+        <div class="party-slogan">जात पर न पात पर, प्राथमिकता विकास पर</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="membership.html" class="active">Membership</a></li>
+      <li><a href="donation.html">Donate</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="donation.html"    class="btn btn-outline-orange btn-sm">💛 Donate</a>
+      <a href="member-area.html" class="btn btn-orange btn-sm">👤 Member Login</a>
+    </div>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===== MOBILE NAV ===== -->
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="about.html">🏛️ About</a></li>
+    <li><a href="membership.html">🪪 Membership</a></li>
+    <li><a href="donation.html">💛 Donate</a></li>
+    <li><a href="contact.html">📞 Contact</a></li>
+  </ul>
+  <div class="mobile-nav-actions">
+    <a href="member-area.html" class="btn btn-orange btn-full">👤 Member Login / Register</a>
+    <a href="donation.html"    class="btn btn-outline-orange btn-full">💛 Donate Now</a>
+  </div>
+</nav>
+
+<!-- ===== PAGE HERO ===== -->
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-hero-title">Join Jan Kalyan Party</h1>
+    <div class="page-hero-crumb">
+      <a href="index.html">Home</a> <span>›</span> <span>Membership</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MEMBERSHIP FORMS ===== -->
+<section class="section-pad" id="join">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="section-label">Step 1 — Choose Your Role</span>
+      <h2 class="section-title">Select <span>Membership Type</span></h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">Select how you want to join Jan Kalyan Party. Each type comes with an official digital ID card.</p>
+    </div>
+
+    <!-- TYPE SELECTOR -->
+    <div class="mem-type-selector">
+      <button class="mem-type-btn general" data-type="general" id="btn-general">
+        <div class="selected-tick">✓</div>
+        <div class="mem-type-badge">Free</div>
+        <span class="mem-type-icon">🔵</span>
+        <div class="mem-type-title">General Member</div>
+        <div class="mem-type-desc">Basic party membership with official ID card and member portal access.</div>
+      </button>
+
+      <button class="mem-type-btn active" data-type="active" id="btn-active">
+        <div class="selected-tick">✓</div>
+        <div class="mem-type-badge">Popular</div>
+        <span class="mem-type-icon">🟠</span>
+        <div class="mem-type-title">Active Member</div>
+        <div class="mem-type-desc">Full membership with campaign access, event participation & leadership eligibility.</div>
+      </button>
+
+      <button class="mem-type-btn volunteer" data-type="volunteer" id="btn-volunteer">
+        <div class="selected-tick">✓</div>
+        <div class="mem-type-badge">Open</div>
+        <span class="mem-type-icon">🟢</span>
+        <div class="mem-type-title">Volunteer</div>
+        <div class="mem-type-desc">Serve the community. Official volunteer ID card and training opportunities.</div>
+      </button>
+    </div>
+
+    <!-- STEP 2 LABEL -->
+    <div class="text-center mb-4" id="form-step-label" style="display:none;">
+      <span class="section-label">Step 2 — Fill Your Details</span>
+    </div>
+
+    <!-- ========================
+         GENERAL MEMBER FORM
+         ======================== -->
+    <div class="form-panel" id="panel-general" id="general">
+      <div class="form-card" id="general-form-container">
+        <div class="form-card-header blue">
+          <div class="form-card-title">🔵 General Member Registration</div>
+          <div class="form-card-sub">Fill in your details to get your official General Member ID card.</div>
+        </div>
+        <div class="form-card-body">
+
+          <!-- Benefits -->
+          <div class="benefits-banner">
+            <div class="benefit-item"><span class="tick">✓</span> Official Member ID</div>
+            <div class="benefit-item"><span class="tick">✓</span> Member Certificate</div>
+            <div class="benefit-item"><span class="tick">✓</span> Party Newsletter</div>
+            <div class="benefit-item"><span class="tick">✓</span> Voting Rights</div>
+            <div class="benefit-item"><span class="tick">✓</span> Member Portal Access</div>
+          </div>
+
+          <form id="general-member-form" data-protected novalidate autocomplete="off">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name <span class="req">*</span></label>
+                <input type="text" name="mem_name" class="form-control" placeholder="Enter your full name" maxlength="100">
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date of Birth <span class="req">*</span></label>
+                <input type="date" name="mem_dob" class="form-control" max="">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" name="mem_email" class="form-control" placeholder="yourname@email.com" maxlength="254">
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number <span class="req">*</span></label>
+                <input type="tel" name="mem_phone" class="form-control" placeholder="10-digit mobile" maxlength="10">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Gender <span class="req">*</span></label>
+                <select name="mem_gender" class="form-control">
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                  <option value="Prefer not to say">Prefer not to say</option>
+                </select>
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Aadhaar Number <span class="req">*</span></label>
+                <input type="text" name="mem_aadhaar" class="form-control" placeholder="XXXX XXXX XXXX" maxlength="14">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">State <span class="req">*</span></label>
+                <select name="mem_state" class="form-control">
+                  <option value="">Select State</option>
+                </select>
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">District</label>
+                <input type="text" name="mem_district" class="form-control" placeholder="Your district" maxlength="60">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Full Address</label>
+              <textarea name="mem_address" class="form-control" rows="2" placeholder="House/Street/Village/City" maxlength="300" style="resize:vertical;"></textarea>
+              <div class="form-error"></div>
+            </div>
+
+            <div class="form-check">
+              <input type="checkbox" name="mem_agree" id="gm-agree">
+              <label class="form-check-label" for="gm-agree">
+                I agree to the <a href="#" target="_blank">Terms & Conditions</a> and
+                <a href="#" target="_blank">Privacy Policy</a> of Jan Kalyan Party.
+                I confirm that all information provided is accurate and true.
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-blue btn-full mt-3" style="margin-top:20px;">
+              🪪 Register as General Member
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================
+         ACTIVE MEMBER FORM
+         ======================== -->
+    <div class="form-panel" id="panel-active" id="active">
+      <div class="form-card" id="active-form-container">
+        <div class="form-card-header orange">
+          <div class="form-card-title">🟠 Active Member Registration</div>
+          <div class="form-card-sub">Join as an Active Member and take part in party campaigns and leadership.</div>
+        </div>
+        <div class="form-card-body">
+
+          <div class="benefits-banner">
+            <div class="benefit-item"><span class="tick">✓</span> Active Member ID</div>
+            <div class="benefit-item"><span class="tick">✓</span> Campaign Access</div>
+            <div class="benefit-item"><span class="tick">✓</span> Leadership Eligibility</div>
+            <div class="benefit-item"><span class="tick">✓</span> Direct Leader Access</div>
+            <div class="benefit-item"><span class="tick">✓</span> Event Participation</div>
+          </div>
+
+          <form id="active-member-form" data-protected novalidate autocomplete="off">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name <span class="req">*</span></label>
+                <input type="text" name="mem_name" class="form-control" placeholder="Enter your full name" maxlength="100">
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date of Birth <span class="req">*</span></label>
+                <input type="date" name="mem_dob" class="form-control" max="">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" name="mem_email" class="form-control" placeholder="yourname@email.com" maxlength="254">
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number <span class="req">*</span></label>
+                <input type="tel" name="mem_phone" class="form-control" placeholder="10-digit mobile" maxlength="10">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Gender <span class="req">*</span></label>
+                <select name="mem_gender" class="form-control">
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                  <option value="Prefer not to say">Prefer not to say</option>
+                </select>
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Aadhaar Number <span class="req">*</span></label>
+                <input type="text" name="mem_aadhaar" class="form-control" placeholder="XXXX XXXX XXXX" maxlength="14">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">State <span class="req">*</span></label>
+                <select name="mem_state" class="form-control">
+                  <option value="">Select State</option>
+                </select>
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">District</label>
+                <input type="text" name="mem_district" class="form-control" placeholder="Your district" maxlength="60">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Occupation / Profession</label>
+              <input type="text" name="mem_occupation" class="form-control" placeholder="e.g. Teacher, Farmer, Business" maxlength="100">
+              <div class="form-error"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Why do you want to be an Active Member?</label>
+              <textarea name="mem_reason" class="form-control" rows="3"
+                placeholder="Brief reason for joining as active member..." maxlength="500" style="resize:vertical;"></textarea>
+              <div class="form-error"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Full Address</label>
+              <textarea name="mem_address" class="form-control" rows="2" placeholder="House/Street/Village/City" maxlength="300" style="resize:vertical;"></textarea>
+              <div class="form-error"></div>
+            </div>
+
+            <div class="form-check">
+              <input type="checkbox" name="mem_agree" id="am-agree">
+              <label class="form-check-label" for="am-agree">
+                I agree to the <a href="#" target="_blank">Terms & Conditions</a> and
+                <a href="#" target="_blank">Privacy Policy</a> of Jan Kalyan Party.
+                I confirm all information is accurate and I am at least 18 years of age.
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-orange btn-full" style="margin-top:20px;">
+              🟠 Register as Active Member
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================
+         VOLUNTEER FORM
+         ======================== -->
+    <div class="form-panel" id="panel-volunteer" id="volunteer">
+      <div class="form-card" id="volunteer-form-container">
+        <div class="form-card-header green">
+          <div class="form-card-title">🟢 Volunteer Registration</div>
+          <div class="form-card-sub">Join our volunteer force and serve the community with Jan Kalyan Party.</div>
+        </div>
+        <div class="form-card-body">
+
+          <div class="benefits-banner">
+            <div class="benefit-item"><span class="tick">✓</span> Volunteer ID Card</div>
+            <div class="benefit-item"><span class="tick">✓</span> Community Service</div>
+            <div class="benefit-item"><span class="tick">✓</span> Skill Training</div>
+            <div class="benefit-item"><span class="tick">✓</span> Recognition & Awards</div>
+            <div class="benefit-item"><span class="tick">✓</span> Campaign Access</div>
+          </div>
+
+          <form id="volunteer-form" data-protected novalidate autocomplete="off">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name <span class="req">*</span></label>
+                <input type="text" name="vol_name" class="form-control" placeholder="Enter your full name" maxlength="100">
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date of Birth <span class="req">*</span></label>
+                <input type="date" name="vol_dob" class="form-control" max="">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" name="vol_email" class="form-control" placeholder="yourname@email.com" maxlength="254">
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number <span class="req">*</span></label>
+                <input type="tel" name="vol_phone" class="form-control" placeholder="10-digit mobile" maxlength="10">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Gender <span class="req">*</span></label>
+                <select name="vol_gender" class="form-control">
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                  <option value="Prefer not to say">Prefer not to say</option>
+                </select>
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Availability <span class="req">*</span></label>
+                <select name="vol_availability" class="form-control">
+                  <option value="">Select Availability</option>
+                  <option value="Weekends only">Weekends Only</option>
+                  <option value="Weekdays only">Weekdays Only</option>
+                  <option value="Full time">Full Time</option>
+                  <option value="Part time">Part Time</option>
+                  <option value="As needed">As Needed / Flexible</option>
+                </select>
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">State <span class="req">*</span></label>
+                <select name="vol_state" class="form-control">
+                  <option value="">Select State</option>
+                </select>
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">District</label>
+                <input type="text" name="vol_district" class="form-control" placeholder="Your district" maxlength="60">
+                <div class="form-error"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Occupation / Profession</label>
+              <input type="text" name="vol_occupation" class="form-control" placeholder="e.g. Student, Teacher, Farmer" maxlength="100">
+              <div class="form-error"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Skills / Areas of Interest</label>
+              <textarea name="vol_skills" class="form-control" rows="2"
+                placeholder="e.g. Social Media, Public Speaking, Community Outreach, IT..." maxlength="500" style="resize:vertical;"></textarea>
+              <div class="form-error"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Full Address</label>
+              <textarea name="vol_address" class="form-control" rows="2" placeholder="House/Street/Village/City" maxlength="300" style="resize:vertical;"></textarea>
+              <div class="form-error"></div>
+            </div>
+
+            <div class="form-check">
+              <input type="checkbox" name="vol_agree" id="vol-agree">
+              <label class="form-check-label" for="vol-agree">
+                I agree to the <a href="#" target="_blank">Terms & Conditions</a> and
+                <a href="#" target="_blank">Privacy Policy</a>. I confirm all information is accurate
+                and I am at least 18 years of age.
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-green btn-full" style="margin-top:20px;">
+              🟢 Register as Volunteer
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== BENEFITS COMPARISON ===== -->
+<section class="section-pad benefits-section">
+  <div class="container text-center">
+    <span class="section-label">Compare</span>
+    <h2 class="section-title">Membership <span>Benefits</span></h2>
+    <div class="section-divider"></div>
+
+    <div class="benefits-compare" data-stagger="100">
+      <div class="benefit-col general reveal">
+        <div class="benefit-col-head">
+          <div class="benefit-col-title">🔵 General Member</div>
+          <div class="benefit-col-sub">Basic Membership</div>
+        </div>
+        <div class="benefit-col-body">
+          <div class="benefit-row"><span class="chk">✓</span> Official Member ID Card</div>
+          <div class="benefit-row"><span class="chk">✓</span> Member Certificate</div>
+          <div class="benefit-row"><span class="chk">✓</span> Party Newsletter & Updates</div>
+          <div class="benefit-row"><span class="chk">✓</span> Voting Rights in Party Elections</div>
+          <div class="benefit-row"><span class="chk">✓</span> Member Portal Access</div>
+          <div class="benefit-row na"><span class="chk">✗</span> Campaign Participation</div>
+          <div class="benefit-row na"><span class="chk">✗</span> Leadership Eligibility</div>
+          <div class="benefit-row na"><span class="chk">✗</span> Direct Leader Access</div>
+        </div>
+      </div>
+
+      <div class="benefit-col active reveal" data-delay="100">
+        <div class="benefit-col-head">
+          <div class="benefit-col-title">🟠 Active Member</div>
+          <div class="benefit-col-sub">Full Membership</div>
+        </div>
+        <div class="benefit-col-body">
+          <div class="benefit-row"><span class="chk">✓</span> Official Active Member ID Card</div>
+          <div class="benefit-row"><span class="chk">✓</span> Member Certificate</div>
+          <div class="benefit-row"><span class="chk">✓</span> Party Newsletter & Updates</div>
+          <div class="benefit-row"><span class="chk">✓</span> Voting Rights in Party Elections</div>
+          <div class="benefit-row"><span class="chk">✓</span> Member Portal Access</div>
+          <div class="benefit-row"><span class="chk">✓</span> Campaign Participation</div>
+          <div class="benefit-row"><span class="chk">✓</span> Leadership Eligibility</div>
+          <div class="benefit-row"><span class="chk">✓</span> Direct Leader Access</div>
+        </div>
+      </div>
+
+      <div class="benefit-col volunteer reveal" data-delay="200">
+        <div class="benefit-col-head" style="background:linear-gradient(135deg,#2E7D32,#388E3C);">
+          <div class="benefit-col-title">🟢 Volunteer</div>
+          <div class="benefit-col-sub">Community Service</div>
+        </div>
+        <div class="benefit-col-body">
+          <div class="benefit-row"><span class="chk">✓</span> Official Volunteer ID Card</div>
+          <div class="benefit-row"><span class="chk">✓</span> Volunteer Certificate</div>
+          <div class="benefit-row"><span class="chk">✓</span> Party Newsletter & Updates</div>
+          <div class="benefit-row"><span class="chk">✓</span> Training & Skill Development</div>
+          <div class="benefit-row"><span class="chk">✓</span> Volunteer Portal Access</div>
+          <div class="benefit-row"><span class="chk">✓</span> Community Campaign Access</div>
+          <div class="benefit-row"><span class="chk">✓</span> Recognition & Awards</div>
+          <div class="benefit-row na"><span class="chk">✗</span> Party Leadership Eligibility</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="section-pad" style="background:var(--white);">
+  <div class="container text-center">
+    <span class="section-label">Got Questions?</span>
+    <h2 class="section-title">Membership <span>FAQ</span></h2>
+    <div class="section-divider"></div>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question">
+          Is there any fee to join Jan Kalyan Party?
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          No. Joining Jan Kalyan Party as a General Member, Active Member, or Volunteer is completely free of charge. We believe participation in democracy should be accessible to all.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          What is the minimum age to join?
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          You must be at least 18 years of age to register as a Member or Volunteer with Jan Kalyan Party, as per the Election Commission of India guidelines.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          How do I get my official ID card?
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          After successful registration, your digital ID card is generated instantly and displayed on screen. You can print it or download it directly. A physical card dispatch feature will be available soon.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          What is the difference between General and Active membership?
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          A General Member gets basic party rights — ID card, newsletter, and voting rights in party elections. An Active Member gets everything in General membership plus campaign participation rights, direct access to party leadership, and eligibility for party positions.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          Can I be both a Member and a Volunteer?
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          Yes! You can register as a Member (General or Active) and also participate in volunteer activities. Contact us at jankalyanpartyofficial@gmail.com for combined registration guidance.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          Is my personal information safe?
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          Absolutely. Jan Kalyan Party takes your privacy seriously. Your Aadhaar number and personal details are securely encrypted and never shared with third parties. We comply with India's data protection guidelines.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+          <div>
+            <div class="footer-brand-name">Jan Kalyan Party</div>
+            <div class="footer-brand-slogan hindi">जात पर न पात पर, प्राथमिकता विकास पर</div>
+          </div>
+        </div>
+        <p class="footer-desc">Jan Kalyan Party is committed to inclusive development, social justice, and the welfare of every citizen of India.</p>
+        <div class="footer-socials">
+          <a href="https://facebook.com/jankalyanparty"  target="_blank" rel="noopener" class="footer-social-btn">f</a>
+          <a href="https://twitter.com/jankalyanparty"   target="_blank" rel="noopener" class="footer-social-btn">𝕏</a>
+          <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="footer-social-btn">in</a>
+          <a href="https://youtube.com/@jankalyanparty"  target="_blank" rel="noopener" class="footer-social-btn">▶</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Party</a></li>
+          <li><a href="membership.html">Membership</a></li>
+          <li><a href="donation.html">Donate</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Membership</div>
+        <ul class="footer-links">
+          <li><a href="membership.html#general">General Member</a></li>
+          <li><a href="membership.html#active">Active Member</a></li>
+          <li><a href="membership.html#volunteer">Volunteer</a></li>
+          <li><a href="member-area.html">Member Login</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-links">
+          <li><a href="mailto:jankalyanpartyofficial@gmail.com">📧 jankalyanpartyofficial@gmail.com</a></li>
+          <li><a href="tel:+917376409590">📞 +91 7376409590</a></li>
+          <li><a href="contact.html#map">📍 Party Headquarter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Jan Kalyan Party. All rights reserved.</span>
+      <span><a href="#">Privacy Policy</a> &nbsp;|&nbsp; <a href="#">Terms of Use</a></span>
+      <span>Made with 🧡 for the People of India</span>
+    </div>
+  </div>
+</footer>
+
+<button id="back-to-top" aria-label="Back to top">↑</button>
+<div class="toast-wrap"></div>
+
+<!-- Scripts -->
+<script src="js/security.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/membership.js"></script>
+<script>
+  // ---- Set max DOB to today (must be 18+) ----
+  (function() {
+    const today = new Date();
+    today.setFullYear(today.getFullYear() - 18);
+    const maxDob = today.toISOString().split('T')[0];
+    document.querySelectorAll('input[name="mem_dob"], input[name="vol_dob"]').forEach(el => {
+      el.max = maxDob;
+    });
+  })();
+
+  // ---- Membership type selector ----
+  const typeBtns  = document.querySelectorAll('.mem-type-btn');
+  const panels    = document.querySelectorAll('.form-panel');
+  const stepLabel = document.getElementById('form-step-label');
+
+  typeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Update buttons
+      typeBtns.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      // Show the right panel
+      const type = btn.dataset.type;
+      panels.forEach(p => p.classList.remove('active'));
+      const target = document.getElementById('panel-' + type);
+      if (target) {
+        target.classList.add('active');
+        // Smooth scroll to form
+        setTimeout(() => {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+
+      if (stepLabel) stepLabel.style.display = 'block';
+    });
+  });
+
+  // ---- Check for hash links (#general, #active, #volunteer) ----
+  window.addEventListener('load', () => {
+    const hash = window.location.hash.replace('#','');
+    const validTypes = ['general','active','volunteer'];
+    if (validTypes.includes(hash)) {
+      const btn = document.getElementById('btn-' + hash);
+      if (btn) btn.click();
+    }
+  });
+
+  // ---- FAQ accordion ----
+  document.querySelectorAll('.faq-question').forEach(q => {
+    q.addEventListener('click', () => {
+      const answer  = q.nextElementSibling;
+      const isOpen  = q.classList.contains('open');
+
+      // Close all
+      document.querySelectorAll('.faq-question').forEach(oq => {
+        oq.classList.remove('open');
+        oq.nextElementSibling.classList.remove('open');
+      });
+
+      // Open clicked (if was closed)
+      if (!isOpen) {
+        q.classList.add('open');
+        answer.classList.add('open');
+      }
+    });
+  });
+</script>
+</body>
+</html>
