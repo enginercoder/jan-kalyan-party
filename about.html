@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About Jan Kalyan Party — Learn about our history, mission, vision, and leadership under Founder & President Mr. Lal Bahadur Pal.">
+  <meta name="keywords" content="Jan Kalyan Party, About, Lal Bahadur Pal, Mission, Vision, Leadership">
+  <title>About Us — Jan Kalyan Party</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ---- President Profile ---- */
+    .president-section {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      position: relative;
+      overflow: hidden;
+    }
+    .president-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(255,107,0,0.12), transparent 55%);
+      pointer-events: none;
+    }
+    .president-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .president-avatar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .president-avatar {
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,107,0,0.3), rgba(255,255,255,0.1));
+      border: 4px solid rgba(255,107,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; color: white; font-weight: 700;
+      box-shadow: 0 0 40px rgba(255,107,0,0.25);
+      position: relative;
+    }
+    .president-avatar::after {
+      content: '✦';
+      position: absolute;
+      bottom: 10px; right: 10px;
+      width: 36px; height: 36px;
+      background: var(--orange);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+      border: 3px solid white;
+    }
+    .president-name-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      width: 100%;
+    }
+    .president-name-card .pname { font-size: 1.05rem; font-weight: 800; color: white; }
+    .president-name-card .prole {
+      font-size: 0.75rem; color: var(--orange-light);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: 3px;
+    }
+    .president-text .section-divider { margin-left: 0; }
+    .president-quote {
+      background: rgba(255,255,255,0.07);
+      border-left: 4px solid var(--orange);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: rgba(255,255,255,0.9);
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      line-height: 1.7;
+    }
+    .president-quote cite {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--orange-light);
+      font-style: normal;
+      font-weight: 600;
+    }
+    .president-bio {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.85;
+    }
+
+    /* ---- Mission Vision ---- */
+    .mv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 50px;
+    }
+    .mv-card {
+      border-radius: var(--radius-md);
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mv-card.mission { background: linear-gradient(135deg, var(--orange-pale), #fff); border: 2px solid rgba(255,107,0,0.15); }
+    .mv-card.vision  { background: linear-gradient(135deg, var(--blue-pale),   #fff); border: 2px solid rgba(21,101,192,0.15); }
+    .mv-icon {
+      font-size: 2.8rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .mv-title {
+      font-size: 1.4rem; font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .mv-card.mission .mv-title { color: var(--orange); }
+    .mv-card.vision  .mv-title { color: var(--blue); }
+    .mv-desc { font-size: 0.92rem; color: var(--gray-600); line-height: 1.85; }
+    .mv-points { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .mv-point {
+      display: flex; align-items: flex-start; gap: 9px;
+      font-size: 0.86rem; color: var(--text-mid);
+    }
+    .mv-point .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 5px;
+    }
+    .mv-card.mission .dot { background: var(--orange); }
+    .mv-card.vision  .dot { background: var(--blue); }
+
+    /* ---- Timeline ---- */
+    .timeline-section { background: var(--off-white); }
+    .timeline {
+      max-width: 800px; margin: 50px auto 0;
+      position: relative;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--orange), var(--blue));
+      transform: translateX(-50%);
+    }
+    .timeline-item {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 40px;
+      align-items: flex-start;
+      position: relative;
+    }
+    .timeline-item:nth-child(odd)  { flex-direction: row; }
+    .timeline-item:nth-child(even) { flex-direction: row-reverse; }
+    .timeline-content {
+      flex: 1;
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .timeline-content:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .timeline-item:nth-child(odd)  .timeline-content { text-align: right; }
+    .timeline-item:nth-child(even) .timeline-content { text-align: left; }
+    .timeline-year {
+      font-size: 1.3rem; font-weight: 800; color: var(--orange); margin-bottom: 6px;
+    }
+    .timeline-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
+    .timeline-desc  { font-size: 0.82rem; color: var(--gray-600); line-height: 1.7; }
+    .timeline-dot {
+      width: 16px; height: 16px;
+      background: var(--orange);
+      border: 3px solid white;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px var(--orange);
+      margin-top: 20px;
+      z-index: 1;
+    }
+    .timeline-spacer { flex: 1; }
+
+    /* ---- Full Leadership ---- */
+    .leadership-section { background: var(--gray-100); }
+    .leadership-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      justify-content: center; margin-bottom: 40px;
+    }
+    .ltab {
+      padding: 9px 20px;
+      border: 2px solid var(--gray-200);
+      border-radius: 50px;
+      background: white;
+      font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      color: var(--text-dark);
+      font-family: 'Poppins', sans-serif;
+    }
+    .ltab.active, .ltab:hover {
+      border-color: var(--orange);
+      background: var(--orange);
+      color: white;
+    }
+
+    /* ---- Party Constitution ---- */
+    .constitution-section { background: var(--white); }
+    .constitution-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px; margin-top: 50px;
+    }
+    .constitution-card {
+      background: var(--gray-100);
+      border-radius: var(--radius-md);
+      padding: 28px 22px;
+      text-align: center;
+      transition: var(--transition);
+      border-top: 4px solid transparent;
+    }
+    .constitution-card:hover {
+      border-top-color: var(--orange);
+      background: white;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+    }
+    .constitution-icon { font-size: 2rem; margin-bottom: 12px; display: block; }
+    .constitution-title { font-size: 0.98rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+    .constitution-desc  { font-size: 0.82rem; color: var(--gray-600); line-height: 1.7; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .president-grid { grid-template-columns: 1fr; gap: 36px; }
+      .president-avatar-wrap { flex-direction: row; align-items: center; }
+      .president-avatar { width: 120px; height: 120px; font-size: 2.5rem; }
+      .mv-grid { grid-template-columns: 1fr; }
+      .constitution-grid { grid-template-columns: 1fr 1fr; }
+      .timeline::before { left: 20px; }
+      .timeline-item,
+      .timeline-item:nth-child(even) { flex-direction: row; gap: 20px; }
+      .timeline-dot { margin-top: 16px; }
+      .timeline-item:nth-child(odd) .timeline-content { text-align: left; }
+      .timeline-spacer { display: none; }
+    }
+    @media (max-width: 600px) {
+      .constitution-grid { grid-template-columns: 1fr; }
+      .president-avatar-wrap { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ===== TOP BAR ===== -->
+<div class="top-bar">
+  <div class="container top-bar-inner">
+    <div class="top-bar-left">
+      <a href="mailto:jankalyanpartyofficial@gmail.com"><i class="fa fa-envelope"></i> jankalyanpartyofficial@gmail.com</a>
+      <a href="tel:+917376409590"><i class="fa fa-phone"></i> +91 7376409590</a>
+    </div>
+    <div class="top-bar-right">
+      <a href="https://facebook.com/jankalyanparty"  target="_blank" rel="noopener" class="top-bar-social" aria-label="Facebook">f</a>
+      <a href="https://twitter.com/jankalyanparty"   target="_blank" rel="noopener" class="top-bar-social" aria-label="Twitter">𝕏</a>
+      <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="top-bar-social" aria-label="Instagram">in</a>
+      <a href="https://youtube.com/@jankalyanparty"  target="_blank" rel="noopener" class="top-bar-social" aria-label="YouTube">▶</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+      <div class="nav-logo-text">
+        <div class="party-name">Jan Kalyan Party</div>
+        <div class="party-slogan">जात पर न पात पर, प्राथमिकता विकास पर</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="membership.html">Membership</a></li>
+      <li><a href="donation.html">Donate</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="donation.html"   class="btn btn-outline-orange btn-sm">💛 Donate</a>
+      <a href="member-area.html" class="btn btn-orange btn-sm">👤 Member Login</a>
+    </div>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===== MOBILE NAV ===== -->
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="about.html">🏛️ About</a></li>
+    <li><a href="membership.html">🪪 Membership</a></li>
+    <li><a href="donation.html">💛 Donate</a></li>
+    <li><a href="contact.html">📞 Contact</a></li>
+  </ul>
+  <div class="mobile-nav-actions">
+    <a href="member-area.html" class="btn btn-orange btn-full">👤 Member Login / Register</a>
+    <a href="donation.html"    class="btn btn-outline-orange btn-full">💛 Donate Now</a>
+  </div>
+</nav>
+
+<!-- ===== PAGE HERO ===== -->
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-hero-title">About Jan Kalyan Party</h1>
+    <div class="page-hero-crumb">
+      <a href="index.html">Home</a> <span>›</span> <span>About</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PARTY INTRO ===== -->
+<section class="section-pad">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img-card reveal">
+        <img src="assets/logo.png" alt="Jan Kalyan Party">
+        <div class="about-pill">Founded 2024</div>
+      </div>
+      <div class="about-text reveal" data-delay="150">
+        <span class="section-label">Who We Are</span>
+        <h2 class="section-title">A Movement for <span>Real Change</span></h2>
+        <div class="section-divider left"></div>
+        <p style="color:var(--gray-600);line-height:1.9;margin-bottom:16px;">
+          <strong>Jan Kalyan Party</strong> (JKP) is a political party founded on the belief that
+          true progress comes only when development is prioritised over divisive politics.
+          We stand firmly against caste-based and religion-based vote bank politics and pledge
+          to serve every citizen equally.
+        </p>
+        <p style="color:var(--gray-600);line-height:1.9;margin-bottom:16px;">
+          Our slogan — <strong class="hindi" style="color:var(--blue);">"जात पर न पात पर, प्राथमिकता विकास पर"</strong> —
+          is not just words. It is the foundation of everything we do. From policy to grassroots
+          action, we remain committed to <strong>inclusive development</strong> that leaves no one behind.
+        </p>
+        <p style="color:var(--gray-600);line-height:1.9;">
+          Founded by <strong>Mr. Lal Bahadur Pal</strong>, the party has rapidly grown into a
+          people's movement with thousands of members, volunteers, and supporters across India.
+        </p>
+        <div class="about-features-grid mt-3" data-stagger="80">
+          <div class="about-feat reveal">
+            <div class="about-feat-icon">🗳️</div>
+            <div class="about-feat-text">Democratic Structure</div>
+          </div>
+          <div class="about-feat reveal">
+            <div class="about-feat-icon">📜</div>
+            <div class="about-feat-text">Clear Manifesto</div>
+          </div>
+          <div class="about-feat reveal">
+            <div class="about-feat-icon">🌐</div>
+            <div class="about-feat-text">National Presence</div>
+          </div>
+          <div class="about-feat reveal">
+            <div class="about-feat-icon">💪</div>
+            <div class="about-feat-text">People-Powered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRESIDENT SECTION ===== -->
+<section class="section-pad president-section" id="president">
+  <div class="container">
+    <div class="president-grid">
+      <!-- Avatar -->
+      <div class="president-avatar-wrap reveal">
+        <div class="president-avatar">LP</div>
+        <div class="president-name-card">
+          <div class="pname">Mr. Lal Bahadur Pal</div>
+          <div class="prole">Founder &amp; Party President</div>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="president-text reveal" data-delay="150">
+        <span class="section-label" style="color:rgba(255,255,255,0.6);">Leadership</span>
+        <h2 class="section-title light">Message from Our <span style="color:var(--orange-light);">President</span></h2>
+        <div class="section-divider"></div>
+
+        <blockquote class="president-quote">
+          "जात पर न पात पर, प्राथमिकता विकास पर — यही हमारी पार्टी का मूल मंत्र है।
+          हम एक ऐसे भारत का निर्माण करना चाहते हैं जहाँ हर नागरिक को समान अवसर मिले,
+          जहाँ विकास ही सबसे बड़ी राजनीति हो।"
+          <cite>— Mr. Lal Bahadur Pal, Founder &amp; President, Jan Kalyan Party</cite>
+        </blockquote>
+
+        <p class="president-bio">
+          Mr. Lal Bahadur Pal founded Jan Kalyan Party with a vision to create a political
+          movement rooted in the welfare of the common people. With deep grassroots connections
+          and a commitment to transparent, development-focused governance, he has dedicated
+          his life to public service. Under his leadership, the party has grown into a
+          credible force for change, standing for the rights and welfare of every Indian
+          regardless of their background.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MISSION & VISION ===== -->
+<section class="section-pad" id="mission">
+  <div class="container text-center">
+    <span class="section-label">Our Purpose</span>
+    <h2 class="section-title">Mission &amp; <span>Vision</span></h2>
+    <div class="section-divider"></div>
+
+    <div class="mv-grid">
+      <!-- Mission -->
+      <div class="mv-card mission reveal">
+        <span class="mv-icon">🎯</span>
+        <div class="mv-title">Our Mission</div>
+        <p class="mv-desc">
+          To build a transparent, inclusive, and development-focused political movement
+          that puts the welfare of every Indian citizen — regardless of caste, religion,
+          or economic background — at the heart of governance.
+        </p>
+        <div class="mv-points">
+          <div class="mv-point"><div class="dot"></div>Prioritise development over divisive politics</div>
+          <div class="mv-point"><div class="dot"></div>Empower marginalised communities through policy</div>
+          <div class="mv-point"><div class="dot"></div>Ensure transparent, accountable governance</div>
+          <div class="mv-point"><div class="dot"></div>Build grassroots political awareness across India</div>
+        </div>
+      </div>
+
+      <!-- Vision -->
+      <div class="mv-card vision reveal" data-delay="150">
+        <span class="mv-icon">🔭</span>
+        <div class="mv-title">Our Vision</div>
+        <p class="mv-desc">
+          A prosperous, equal, and united India where every citizen has access to
+          quality education, healthcare, and economic opportunity — and where political
+          decisions are driven by data, compassion, and national interest.
+        </p>
+        <div class="mv-points">
+          <div class="mv-point"><div class="dot"></div>100% literacy and quality education nationwide</div>
+          <div class="mv-point"><div class="dot"></div>Universal healthcare accessible to all citizens</div>
+          <div class="mv-point"><div class="dot"></div>Zero unemployment through skill &amp; industry growth</div>
+          <div class="mv-point"><div class="dot"></div>A corruption-free, digital India for all</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PARTY JOURNEY TIMELINE ===== -->
+<section class="section-pad timeline-section" id="history">
+  <div class="container text-center">
+    <span class="section-label">Our Journey</span>
+    <h2 class="section-title">Party <span>History</span></h2>
+    <div class="section-divider"></div>
+
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-content">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-title">Party Founded</div>
+          <div class="timeline-desc">Jan Kalyan Party officially founded by Mr. Lal Bahadur Pal with the mission to bring development-first politics to India.</div>
+        </div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-spacer"></div>
+      </div>
+
+      <div class="timeline-item reveal" data-delay="100">
+        <div class="timeline-spacer"></div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-title">First 1,000 Members</div>
+          <div class="timeline-desc">Within months of founding, the party registered its first 1,000 members and established local units across multiple districts.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" data-delay="200">
+        <div class="timeline-content">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-title">Volunteer Programme Launched</div>
+          <div class="timeline-desc">The JKP Volunteer Programme was launched, mobilising hundreds of youth volunteers for community welfare activities.</div>
+        </div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-spacer"></div>
+      </div>
+
+      <div class="timeline-item reveal" data-delay="300">
+        <div class="timeline-spacer"></div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2025</div>
+          <div class="timeline-title">Digital Expansion</div>
+          <div class="timeline-desc">Launch of the official JKP website with online membership, digital ID cards, and the member portal for all registered members.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" data-delay="400">
+        <div class="timeline-content">
+          <div class="timeline-year">Future</div>
+          <div class="timeline-title">National Presence</div>
+          <div class="timeline-desc">Expanding to all 28 states and 8 Union Territories — building the largest development-focused political movement in India.</div>
+        </div>
+        <div class="timeline-dot" style="background:var(--blue);box-shadow:0 0 0 3px var(--blue);"></div>
+        <div class="timeline-spacer"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LEADERSHIP ===== -->
+<section class="section-pad leadership-section" id="leaders">
+  <div class="container text-center">
+    <span class="section-label">Our Team</span>
+    <h2 class="section-title">Party <span>Leadership</span></h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">
+      Dedicated leaders at every level, committed to the welfare of the people.
+    </p>
+
+    <!-- Tabs -->
+    <div class="leadership-tabs mt-3">
+      <button class="ltab active" data-tab="national">National Leadership</button>
+      <button class="ltab" data-tab="state">State Leaders</button>
+      <button class="ltab" data-tab="youth">Youth Wing</button>
+    </div>
+
+    <!-- National Leadership -->
+    <div id="tab-national" class="leaders-grid" data-stagger="80">
+      <div class="leader-card reveal">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar" style="background:linear-gradient(135deg,var(--orange),var(--blue));">LP</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">Mr. Lal Bahadur Pal</div>
+          <div class="leader-role">Founder &amp; Party President</div>
+        </div>
+      </div>
+      <div class="leader-card reveal">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar">VP</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">Vice President</div>
+          <div class="leader-role">National Vice President</div>
+        </div>
+      </div>
+      <div class="leader-card reveal">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar">GS</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">General Secretary</div>
+          <div class="leader-role">National General Secretary</div>
+        </div>
+      </div>
+      <div class="leader-card reveal">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar">TR</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">Treasurer</div>
+          <div class="leader-role">National Treasurer</div>
+        </div>
+      </div>
+      <div class="leader-card reveal">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar">SP</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">Spokesperson</div>
+          <div class="leader-role">National Spokesperson</div>
+        </div>
+      </div>
+      <div class="leader-card reveal">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar">OC</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">Organising Committee</div>
+          <div class="leader-role">National Organising Secretary</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- State Leaders (hidden by default) -->
+    <div id="tab-state" class="leaders-grid" style="display:none;" data-stagger="80">
+      <div class="leader-card">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar" style="background:linear-gradient(135deg,#1565C0,#1976D2);">UP</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">State President — UP</div>
+          <div class="leader-role">Uttar Pradesh</div>
+        </div>
+      </div>
+      <div class="leader-card">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar" style="background:linear-gradient(135deg,#2E7D32,#388E3C);">BR</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">State President — Bihar</div>
+          <div class="leader-role">Bihar</div>
+        </div>
+      </div>
+      <div class="leader-card">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar" style="background:linear-gradient(135deg,#E55A00,#FF6B00);">DL</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">State President — Delhi</div>
+          <div class="leader-role">Delhi</div>
+        </div>
+      </div>
+      <div class="leader-card">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar">MP</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">State President — MP</div>
+          <div class="leader-role">Madhya Pradesh</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Youth Wing (hidden by default) -->
+    <div id="tab-youth" class="leaders-grid" style="display:none;" data-stagger="80">
+      <div class="leader-card">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar" style="background:linear-gradient(135deg,var(--orange),var(--blue));">YP</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">Youth Wing President</div>
+          <div class="leader-role">National Youth President</div>
+        </div>
+      </div>
+      <div class="leader-card">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar">YS</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">Youth Secretary</div>
+          <div class="leader-role">National Youth Secretary</div>
+        </div>
+      </div>
+      <div class="leader-card">
+        <div class="leader-img-wrap">
+          <div class="leader-avatar">WW</div>
+        </div>
+        <div class="leader-body">
+          <div class="leader-name">Women's Wing Head</div>
+          <div class="leader-role">Women's Wing President</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PARTY CONSTITUTION ===== -->
+<section class="section-pad constitution-section">
+  <div class="container text-center">
+    <span class="section-label">Our Foundation</span>
+    <h2 class="section-title">Party <span>Principles</span></h2>
+    <div class="section-divider"></div>
+
+    <div class="constitution-grid" data-stagger="80">
+      <div class="constitution-card reveal">
+        <span class="constitution-icon">🏛️</span>
+        <div class="constitution-title">Democratic Values</div>
+        <div class="constitution-desc">Every decision in the party is made democratically. Members have a voice in shaping party policy and direction.</div>
+      </div>
+      <div class="constitution-card reveal">
+        <span class="constitution-icon">🔍</span>
+        <div class="constitution-title">Financial Transparency</div>
+        <div class="constitution-desc">All donations and party finances are managed transparently with regular public disclosures and audits.</div>
+      </div>
+      <div class="constitution-card reveal">
+        <span class="constitution-icon">🤝</span>
+        <div class="constitution-title">Zero Tolerance for Corruption</div>
+        <div class="constitution-desc">Any party member found involved in corrupt practices faces immediate disciplinary action and removal.</div>
+      </div>
+      <div class="constitution-card reveal">
+        <span class="constitution-icon">🌿</span>
+        <div class="constitution-title">Environmental Commitment</div>
+        <div class="constitution-desc">We are committed to sustainable development — protecting India's environment for future generations.</div>
+      </div>
+      <div class="constitution-card reveal">
+        <span class="constitution-icon">📣</span>
+        <div class="constitution-title">Freedom of Expression</div>
+        <div class="constitution-desc">We uphold every citizen's right to freely express their opinions and hold their government accountable.</div>
+      </div>
+      <div class="constitution-card reveal">
+        <span class="constitution-icon">🧒</span>
+        <div class="constitution-title">Youth Empowerment</div>
+        <div class="constitution-desc">Dedicated youth wings at every level ensure the next generation has a strong voice in shaping India's future.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== JOIN CTA ===== -->
+<section style="background:linear-gradient(135deg,var(--orange),var(--orange-dark));padding:60px 0;text-align:center;">
+  <div class="container">
+    <h2 style="color:white;font-size:clamp(1.5rem,3.5vw,2.3rem);font-weight:800;margin-bottom:10px;">
+      Be Part of the Change
+    </h2>
+    <p class="hindi" style="color:rgba(255,255,255,0.85);font-size:1rem;margin-bottom:28px;">
+      जन कल्याण पार्टी से जुड़ें — देश बदलने का सफर शुरू करें
+    </p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="membership.html" class="btn btn-lg" style="background:white;color:var(--orange);">🪪 Join the Party</a>
+      <a href="donation.html"   class="btn btn-outline-white btn-lg">💛 Support Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+          <div>
+            <div class="footer-brand-name">Jan Kalyan Party</div>
+            <div class="footer-brand-slogan hindi">जात पर न पात पर, प्राथमिकता विकास पर</div>
+          </div>
+        </div>
+        <p class="footer-desc">Jan Kalyan Party is committed to inclusive development, social justice, and the welfare of every citizen of India.</p>
+        <div class="footer-socials">
+          <a href="https://facebook.com/jankalyanparty"  target="_blank" rel="noopener" class="footer-social-btn">f</a>
+          <a href="https://twitter.com/jankalyanparty"   target="_blank" rel="noopener" class="footer-social-btn">𝕏</a>
+          <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="footer-social-btn">in</a>
+          <a href="https://youtube.com/@jankalyanparty"  target="_blank" rel="noopener" class="footer-social-btn">▶</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Party</a></li>
+          <li><a href="membership.html">Membership</a></li>
+          <li><a href="donation.html">Donate</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Membership</div>
+        <ul class="footer-links">
+          <li><a href="membership.html#general">General Member</a></li>
+          <li><a href="membership.html#active">Active Member</a></li>
+          <li><a href="membership.html#volunteer">Volunteer</a></li>
+          <li><a href="member-area.html">Member Login</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-links">
+          <li><a href="mailto:jankalyanpartyofficial@gmail.com">📧 jankalyanpartyofficial@gmail.com</a></li>
+          <li><a href="tel:+917376409590">📞 +91 7376409590</a></li>
+          <li><a href="contact.html#map">📍 Party Headquarter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Jan Kalyan Party. All rights reserved.</span>
+      <span><a href="#">Privacy Policy</a> &nbsp;|&nbsp; <a href="#">Terms of Use</a></span>
+      <span>Made with 🧡 for the People of India</span>
+    </div>
+  </div>
+</footer>
+
+<button id="back-to-top" aria-label="Back to top">↑</button>
+<div class="toast-wrap"></div>
+
+<!-- Scripts -->
+<script src="js/security.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // Leadership tab switching
+  document.querySelectorAll('.ltab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.ltab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.tab;
+      ['national','state','youth'].forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (el) el.style.display = (t === target) ? 'grid' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>
