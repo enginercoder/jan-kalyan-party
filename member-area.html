@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Jan Kalyan Party Member Area — Login or Register to access your member dashboard, ID card, and membership details.">
+  <meta name="keywords" content="Jan Kalyan Party member login, member area, dashboard, membership ID">
+  <title>Member Area — Jan Kalyan Party</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ---- Member Area Page ---- */
+    .member-area-wrap {
+      min-height: 80vh;
+      background: var(--gray-100);
+      padding: 60px 0;
+    }
+
+    /* ---- Auth Card ---- */
+    .auth-card {
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .auth-head {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      padding: 32px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-head::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(255,107,0,0.15), transparent 60%);
+    }
+    .auth-head img {
+      width: 64px; height: 64px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      padding: 8px;
+      margin-bottom: 12px;
+      position: relative; z-index: 1;
+    }
+    .auth-head h2 {
+      font-size: 1.3rem; font-weight: 800;
+      position: relative; z-index: 1;
+    }
+    .auth-head p {
+      font-size: 0.80rem; opacity: 0.80;
+      margin-top: 5px;
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      position: relative; z-index: 1;
+    }
+    .auth-body { padding: 30px 32px; }
+    .auth-tabs {
+      display: flex;
+      background: var(--gray-100);
+      border-radius: var(--radius-sm);
+      padding: 4px; gap: 4px;
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1; padding: 10px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-size: 0.875rem; font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--gray-600);
+      font-family: 'Poppins', sans-serif;
+    }
+    .auth-tab.active {
+      background: var(--white);
+      color: var(--orange);
+      box-shadow: var(--shadow-sm);
+    }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    /* Password input wrapper */
+    .pwd-input-wrap { position: relative; }
+    .pwd-input-wrap .form-control { padding-right: 44px; }
+    .pwd-toggle {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; font-size: 1rem;
+      color: var(--gray-400); padding: 0;
+    }
+    /* Strength bar */
+    .strength-bar-wrap {
+      height: 4px;
+      background: var(--gray-200);
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    #pwd-strength-bar {
+      height: 100%; width: 0;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    #pwd-strength-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-top: 3px;
+      display: block;
+    }
+    /* Divider */
+    .auth-divider {
+      text-align: center;
+      position: relative;
+      margin: 18px 0;
+      color: var(--gray-400);
+      font-size: 0.78rem;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%; width: 42%;
+      height: 1px;
+      background: var(--gray-200);
+    }
+    .auth-divider::before { left: 0; }
+    .auth-divider::after  { right: 0; }
+    .auth-link {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--gray-600);
+      margin-top: 14px;
+    }
+    .auth-link a { color: var(--orange); font-weight: 600; }
+
+    /* ---- DASHBOARD ---- */
+    .dashboard-wrap { display: none; }
+    .dashboard-wrap.active { display: block; }
+
+    .dash-header {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 26px;
+      box-shadow: var(--shadow-blue);
+      position: relative;
+      overflow: hidden;
+    }
+    .dash-header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 30%, rgba(255,107,0,0.12), transparent 55%);
+    }
+    .dash-header-left { position: relative; z-index: 1; }
+    .dash-welcome {
+      font-size: 1.4rem; font-weight: 800; line-height: 1.2;
+    }
+    .dash-welcome span { color: var(--orange-light); }
+    .dash-meta { font-size: 0.82rem; opacity: 0.75; margin-top: 5px; }
+    .dash-header-right {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+
+    /* Quick stats */
+    .dash-stats {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+    .dash-stat-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: var(--transition);
+    }
+    .dash-stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .dash-stat-icon {
+      width: 48px; height: 48px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .dash-stat-icon.blue   { background: var(--blue-pale);   }
+    .dash-stat-icon.orange { background: var(--orange-pale);  }
+    .dash-stat-icon.green  { background: #E8F5E9; }
+    .dash-stat-icon.purple { background: #F3E5F5; }
+    .dash-stat-val   { font-size: 1.05rem; font-weight: 800; color: var(--text-dark); line-height: 1.2; }
+    .dash-stat-label { font-size: 0.72rem; color: var(--gray-600); margin-top: 2px; }
+
+    /* Main dashboard grid */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 20px;
+    }
+    .dash-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .dash-card-title {
+      font-size: 0.96rem; font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--gray-100);
+    }
+    .dash-title-icon {
+      width: 30px; height: 30px;
+      background: var(--orange-pale);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--orange); font-size: 0.86rem;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.86rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--gray-600); }
+    .info-val   { font-weight: 600; color: var(--text-dark); text-align: right; }
+    .badge-active  {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 50px;
+      font-size: 0.72rem; font-weight: 700;
+      background: #E8F5E9; color: #2E7D32;
+    }
+    .badge-pending {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 50px;
+      font-size: 0.72rem; font-weight: 700;
+      background: #FFF3E0; color: #E65100;
+    }
+    .badge-registered {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 50px;
+      font-size: 0.72rem; font-weight: 700;
+      background: var(--blue-pale); color: var(--blue-dark);
+    }
+
+    /* Join prompt */
+    .join-prompt {
+      background: linear-gradient(135deg, var(--orange-pale), white);
+      border: 2px dashed rgba(255,107,0,0.3);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: center;
+      margin-top: 16px;
+    }
+    .join-prompt-icon  { font-size: 2rem; margin-bottom: 10px; }
+    .join-prompt-title { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+    .join-prompt-desc  { font-size: 0.82rem; color: var(--gray-600); margin-bottom: 16px; }
+
+    /* Activity feed */
+    .activity-feed { display: flex; flex-direction: column; gap: 12px; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px;
+      background: var(--gray-100);
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+    }
+    .activity-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--orange-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .activity-text { color: var(--text-mid); line-height: 1.5; }
+    .activity-time { font-size: 0.70rem; color: var(--gray-400); margin-top: 2px; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .dash-grid  { grid-template-columns: 1fr; }
+      .dash-stats { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 600px) {
+      .auth-body  { padding: 22px 18px; }
+      .dash-stats { grid-template-columns: repeat(2,1fr); }
+      .dash-header { padding: 20px; }
+      .dash-header-right { width: 100%; }
+      .dash-card  { padding: 18px; }
+    }
+    @media (max-width: 380px) {
+      .dash-stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ===== TOP BAR ===== -->
+<div class="top-bar">
+  <div class="container top-bar-inner">
+    <div class="top-bar-left">
+      <a href="mailto:jankalyanpartyofficial@gmail.com"><i class="fa fa-envelope"></i> jankalyanpartyofficial@gmail.com</a>
+      <a href="tel:+917376409590"><i class="fa fa-phone"></i> +91 7376409590</a>
+    </div>
+    <div class="top-bar-right">
+      <a href="https://facebook.com/jankalyanparty"  target="_blank" rel="noopener" class="top-bar-social">f</a>
+      <a href="https://twitter.com/jankalyanparty"   target="_blank" rel="noopener" class="top-bar-social">𝕏</a>
+      <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="top-bar-social">in</a>
+      <a href="https://youtube.com/@jankalyanparty"  target="_blank" rel="noopener" class="top-bar-social">▶</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+      <div class="nav-logo-text">
+        <div class="party-name">Jan Kalyan Party</div>
+        <div class="party-slogan">जात पर न पात पर, प्राथमिकता विकास पर</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="membership.html">Membership</a></li>
+      <li><a href="donation.html">Donate</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="donation.html"    class="btn btn-outline-orange btn-sm">💛 Donate</a>
+      <a href="member-area.html" class="btn btn-orange btn-sm active">👤 Member Area</a>
+    </div>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===== MOBILE NAV ===== -->
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="about.html">🏛️ About</a></li>
+    <li><a href="membership.html">🪪 Membership</a></li>
+    <li><a href="donation.html">💛 Donate</a></li>
+    <li><a href="contact.html">📞 Contact</a></li>
+  </ul>
+  <div class="mobile-nav-actions">
+    <a href="member-area.html" class="btn btn-orange btn-full">👤 Member Area</a>
+    <a href="donation.html"    class="btn btn-outline-orange btn-full">💛 Donate Now</a>
+  </div>
+</nav>
+
+<!-- ===== PAGE HERO ===== -->
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-hero-title">Member Area</h1>
+    <div class="page-hero-crumb">
+      <a href="index.html">Home</a> <span>›</span> <span>Member Area</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="member-area-wrap">
+  <div class="container">
+
+    <!-- ========================
+         AUTH CARD (Login / Register)
+         ======================== -->
+    <div id="auth-card">
+      <div class="auth-card">
+
+        <!-- Header -->
+        <div class="auth-head">
+          <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+          <h2>Jan Kalyan Party</h2>
+          <p>Member Portal — जन कल्याण पार्टी</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-body">
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tab-login">🔑 Login</button>
+            <button class="auth-tab" id="tab-register">📝 Register</button>
+          </div>
+
+          <!-- ===== LOGIN FORM ===== -->
+          <div class="auth-form active" id="login-form">
+            <form id="login-form-el" data-protected novalidate autocomplete="off">
+
+              <div class="form-group">
+                <label class="form-label">Email or Mobile Number <span class="req">*</span></label>
+                <input type="text" name="login_identifier" class="form-control"
+                       placeholder="Email address or 10-digit mobile" maxlength="254">
+                <div class="form-error"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Password <span class="req">*</span></label>
+                <div class="pwd-input-wrap">
+                  <input type="password" name="login_password" id="login_password"
+                         class="form-control" placeholder="Enter your password" maxlength="128">
+                  <button type="button" class="pwd-toggle" data-target="login_password">👁</button>
+                </div>
+                <div class="form-error"></div>
+              </div>
+
+              <div style="text-align:right;margin-top:-8px;margin-bottom:14px;">
+                <a href="#" style="font-size:0.78rem;color:var(--orange);">Forgot Password?</a>
+              </div>
+
+              <button type="submit" class="btn btn-orange btn-full">
+                🔑 Login to Member Area
+              </button>
+
+              <div class="auth-divider">or</div>
+
+              <div class="auth-link">
+                Don't have an account?
+                <a href="#" id="go-to-register">Register here</a>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- ===== REGISTER FORM ===== -->
+          <div class="auth-form" id="register-form">
+            <form id="register-form-el" data-protected novalidate autocomplete="off">
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Full Name <span class="req">*</span></label>
+                  <input type="text" name="reg_name" class="form-control"
+                         placeholder="Your full name" maxlength="100">
+                  <div class="form-error"></div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mobile Number <span class="req">*</span></label>
+                  <input type="tel" name="reg_phone" class="form-control"
+                         placeholder="10-digit mobile" maxlength="10">
+                  <div class="form-error"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" name="reg_email" class="form-control"
+                       placeholder="yourname@email.com" maxlength="254">
+                <div class="form-error"></div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">State <span class="req">*</span></label>
+                  <select name="reg_state" class="form-control">
+                    <option value="">Select State</option>
+                  </select>
+                  <div class="form-error"></div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">District</label>
+                  <input type="text" name="reg_district" class="form-control"
+                         placeholder="Your district" maxlength="60">
+                  <div class="form-error"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Create Password <span class="req">*</span></label>
+                <div class="pwd-input-wrap">
+                  <input type="password" name="reg_password" id="reg_password"
+                         class="form-control" placeholder="Min. 8 characters" maxlength="128">
+                  <button type="button" class="pwd-toggle" data-target="reg_password">👁</button>
+                </div>
+                <div class="strength-bar-wrap">
+                  <div id="pwd-strength-bar"></div>
+                </div>
+                <span id="pwd-strength-label"></span>
+                <div class="form-error"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Confirm Password <span class="req">*</span></label>
+                <div class="pwd-input-wrap">
+                  <input type="password" name="reg_confirm_password" id="reg_confirm_password"
+                         class="form-control" placeholder="Re-enter password" maxlength="128">
+                  <button type="button" class="pwd-toggle" data-target="reg_confirm_password">👁</button>
+                </div>
+                <div class="form-error"></div>
+              </div>
+
+              <div class="form-check">
+                <input type="checkbox" name="reg_agree" id="reg-agree">
+                <label class="form-check-label" for="reg-agree">
+                  I agree to the <a href="#" target="_blank">Terms & Conditions</a>
+                  and <a href="#" target="_blank">Privacy Policy</a> of Jan Kalyan Party.
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-orange btn-full" style="margin-top:18px;">
+                📝 Create Account
+              </button>
+
+              <div class="auth-divider">or</div>
+
+              <div class="auth-link">
+                Already have an account?
+                <a href="#" id="go-to-login">Login here</a>
+              </div>
+
+            </form>
+          </div>
+
+        </div><!-- /auth-body -->
+      </div><!-- /auth-card -->
+
+      <!-- Below card note -->
+      <p style="text-align:center;margin-top:18px;font-size:0.78rem;color:var(--gray-400);">
+        🔒 Your data is encrypted and secure. Jan Kalyan Party never shares your personal information.
+      </p>
+    </div><!-- /auth-card wrapper -->
+
+
+    <!-- ========================
+         DASHBOARD (shown after login)
+         ======================== -->
+    <div id="dashboard-wrap" class="dashboard-wrap">
+
+      <!-- Header -->
+      <div class="dash-header">
+        <div class="dash-header-left">
+          <div class="dash-welcome">
+            Welcome back, <span id="dash-welcome-name">Member</span>! 👋
+          </div>
+          <div class="dash-meta">
+            Jan Kalyan Party Member Portal &nbsp;|&nbsp;
+            <span id="dash-membership-type">—</span>
+          </div>
+        </div>
+        <div class="dash-header-right">
+          <a href="membership.html" class="btn btn-outline-white btn-sm">🪪 Upgrade Membership</a>
+          <button id="logout-btn" class="btn btn-sm"
+                  style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.4);">
+            🚪 Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="dash-stats">
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon orange">🪪</div>
+          <div>
+            <div class="dash-stat-val" id="dash-member-id" style="font-size:0.82rem;letter-spacing:1px;">—</div>
+            <div class="dash-stat-label">Member ID</div>
+          </div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon blue">📋</div>
+          <div>
+            <div class="dash-stat-val" id="dash-status-stat">—</div>
+            <div class="dash-stat-label">Account Status</div>
+          </div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon green">📅</div>
+          <div>
+            <div class="dash-stat-val" id="dash-joined-stat" style="font-size:0.82rem;">—</div>
+            <div class="dash-stat-label">Member Since</div>
+          </div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon purple">🏆</div>
+          <div>
+            <div class="dash-stat-val" id="dash-type-stat">—</div>
+            <div class="dash-stat-label">Membership Type</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="dash-grid">
+
+        <!-- LEFT: Profile + ID Card -->
+        <div>
+          <!-- Profile Card -->
+          <div class="dash-card mb-3" style="margin-bottom:20px;">
+            <div class="dash-card-title">
+              <div class="dash-title-icon">👤</div>
+              My Profile
+            </div>
+            <div class="info-rows">
+              <div class="info-row">
+                <span class="info-label">Full Name</span>
+                <span class="info-val" id="dash-name">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Email Address</span>
+                <span class="info-val" id="dash-email">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Mobile Number</span>
+                <span class="info-val" id="dash-phone">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">State</span>
+                <span class="info-val" id="dash-state">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">District</span>
+                <span class="info-val" id="dash-district">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Member Since</span>
+                <span class="info-val" id="dash-joined">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-val" id="dash-status">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ID Card -->
+          <div class="dash-card">
+            <div class="dash-card-title">
+              <div class="dash-title-icon">🪪</div>
+              My Membership ID Card
+            </div>
+            <div id="dash-id-card">
+              <!-- Populated by auth.js populateDashboard() -->
+              <div style="text-align:center;padding:24px;color:var(--gray-600);">
+                <p style="font-size:2rem;">🪪</p>
+                <p style="font-weight:600;margin-top:8px;">Loading your ID card...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Activity + Join Prompt -->
+        <div>
+          <!-- Join Membership Prompt (shown if no membership) -->
+          <div id="dash-join-prompt" class="dash-card" style="margin-bottom:20px;">
+            <div class="join-prompt">
+              <div class="join-prompt-icon">🪪</div>
+              <div class="join-prompt-title">Get Your Official Membership</div>
+              <div class="join-prompt-desc">
+                You're registered but haven't joined as a Member or Volunteer yet.
+                Register now to get your official ID card!
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+                <a href="membership.html#general"   class="btn btn-blue btn-sm">🔵 General Member</a>
+                <a href="membership.html#active"    class="btn btn-orange btn-sm">🟠 Active Member</a>
+                <a href="membership.html#volunteer" class="btn btn-green btn-sm">🟢 Volunteer</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="dash-card">
+            <div class="dash-card-title">
+              <div class="dash-title-icon">📋</div>
+              Recent Activity
+            </div>
+            <div class="activity-feed" id="activity-feed">
+              <div class="activity-item">
+                <div class="activity-icon">🔑</div>
+                <div>
+                  <div class="activity-text">You logged in to your member account.</div>
+                  <div class="activity-time" id="activity-login-time">Just now</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon">📝</div>
+                <div>
+                  <div class="activity-text">Account registered with Jan Kalyan Party.</div>
+                  <div class="activity-time" id="activity-joined-time">—</div>
+                </div>
+              </div>
+              <div class="activity-item" id="activity-membership-row" style="display:none;">
+                <div class="activity-icon">🪪</div>
+                <div>
+                  <div class="activity-text" id="activity-membership-text">Membership registered.</div>
+                  <div class="activity-time" id="activity-membership-time">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Links Card -->
+          <div class="dash-card" style="margin-top:20px;">
+            <div class="dash-card-title">
+              <div class="dash-title-icon">🔗</div>
+              Quick Links
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <a href="membership.html" class="btn btn-outline-orange btn-sm btn-full">
+                🪪 Membership Registration
+              </a>
+              <a href="donation.html" class="btn btn-outline-orange btn-sm btn-full">
+                💛 Make a Donation
+              </a>
+              <a href="contact.html" class="btn btn-outline-orange btn-sm btn-full">
+                📞 Contact the Party
+              </a>
+              <a href="about.html" class="btn btn-outline-orange btn-sm btn-full">
+                🏛️ About Jan Kalyan Party
+              </a>
+            </div>
+          </div>
+
+        </div><!-- /right col -->
+      </div><!-- /dash-grid -->
+    </div><!-- /dashboard-wrap -->
+
+  </div><!-- /container -->
+</div><!-- /member-area-wrap -->
+
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+          <div>
+            <div class="footer-brand-name">Jan Kalyan Party</div>
+            <div class="footer-brand-slogan hindi">जात पर न पात पर, प्राथमिकता विकास पर</div>
+          </div>
+        </div>
+        <p class="footer-desc">Jan Kalyan Party is committed to inclusive development, social justice, and the welfare of every citizen of India.</p>
+        <div class="footer-socials">
+          <a href="https://facebook.com/jankalyanparty"  target="_blank" rel="noopener" class="footer-social-btn">f</a>
+          <a href="https://twitter.com/jankalyanparty"   target="_blank" rel="noopener" class="footer-social-btn">𝕏</a>
+          <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="footer-social-btn">in</a>
+          <a href="https://youtube.com/@jankalyanparty"  target="_blank" rel="noopener" class="footer-social-btn">▶</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Party</a></li>
+          <li><a href="membership.html">Membership</a></li>
+          <li><a href="donation.html">Donate</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Membership</div>
+        <ul class="footer-links">
+          <li><a href="membership.html#general">General Member</a></li>
+          <li><a href="membership.html#active">Active Member</a></li>
+          <li><a href="membership.html#volunteer">Volunteer</a></li>
+          <li><a href="member-area.html">Member Login</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-links">
+          <li><a href="mailto:jankalyanpartyofficial@gmail.com">📧 jankalyanpartyofficial@gmail.com</a></li>
+          <li><a href="tel:+917376409590">📞 +91 7376409590</a></li>
+          <li><a href="contact.html#map">📍 Party Headquarter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Jan Kalyan Party. All rights reserved.</span>
+      <span><a href="#">Privacy Policy</a> &nbsp;|&nbsp; <a href="#">Terms of Use</a></span>
+      <span>Made with 🧡 for the People of India</span>
+    </div>
+  </div>
+</footer>
+
+<button id="back-to-top" aria-label="Back to top">↑</button>
+<div class="toast-wrap"></div>
+
+<!-- Scripts -->
+<script src="js/security.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script>
+/* ---- Wire login & register forms to auth.js ---- */
+document.addEventListener('DOMContentLoaded', () => {
+
+  const authCardWrap  = document.getElementById('auth-card');
+  const dashWrap      = document.getElementById('dashboard-wrap');
+  const loginFormEl   = document.getElementById('login-form-el');
+  const registerFormEl= document.getElementById('register-form-el');
+  const tabLogin      = document.getElementById('tab-login');
+  const tabRegister   = document.getElementById('tab-register');
+  const loginPane     = document.getElementById('login-form');
+  const registerPane  = document.getElementById('register-form');
+  const logoutBtn     = document.getElementById('logout-btn');
+  const goToReg       = document.getElementById('go-to-register');
+  const goToLogin     = document.getElementById('go-to-login');
+
+  // Check session
+  const session = getSession();
+  if (session && validateSessionIntegrity()) {
+    showDashboard();
+    populateDashboard();
+    populateActivityFeed(session);
+  }
+
+  // Tab switching
+  tabLogin?.addEventListener('click',    () => switchTab('login'));
+  tabRegister?.addEventListener('click', () => switchTab('register'));
+  goToReg?.addEventListener('click',     (e) => { e.preventDefault(); switchTab('register'); });
+  goToLogin?.addEventListener('click',   (e) => { e.preventDefault(); switchTab('login'); });
+
+  function switchTab(tab) {
+    if (tab === 'login') {
+      tabLogin.classList.add('active');
+      tabRegister.classList.remove('active');
+      loginPane.classList.add('active');
+      registerPane.classList.remove('active');
+    } else {
+      tabRegister.classList.add('active');
+      tabLogin.classList.remove('active');
+      registerPane.classList.add('active');
+      loginPane.classList.remove('active');
+    }
+  }
+
+  // Login submit
+  if (loginFormEl) {
+    Validator.attachLiveClear(loginFormEl);
+    loginFormEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = loginFormEl.querySelector('[type="submit"]');
+      SubmitGuard.lockButton(btn, 'Logging in...');
+      const result = await Login.submit(loginFormEl);
+      if (result && result.success) {
+        showDashboard();
+        populateDashboard();
+        populateActivityFeed(getSession());
+      } else {
+        SubmitGuard.unlockButton(btn);
+      }
+    });
+  }
+
+  // Register submit
+  if (registerFormEl) {
+    Validator.attachLiveClear(registerFormEl);
+    PasswordChecker.attach('reg_password', 'pwd-strength-bar', 'pwd-strength-label');
+    Honeypot.inject(registerFormEl);
+    SubmitTimeGuard.stamp(registerFormEl);
+
+    registerFormEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = registerFormEl.querySelector('[type="submit"]');
+      SubmitGuard.lockButton(btn, 'Creating account...');
+      const result = await Registration.submit(registerFormEl);
+      if (result && result.success) {
+        showDashboard();
+        populateDashboard();
+        populateActivityFeed(getSession());
+      } else {
+        SubmitGuard.unlockButton(btn);
+      }
+    });
+  }
+
+  // Logout
+  logoutBtn?.addEventListener('click', logout);
+
+  function showDashboard() {
+    if (authCardWrap) authCardWrap.style.display = 'none';
+    if (dashWrap) {
+      dashWrap.style.display = 'block';
+      dashWrap.classList.add('active');
+    }
+  }
+});
+
+/* ---- Populate activity feed ---- */
+function populateActivityFeed(session) {
+  if (!session) return;
+
+  const loginTimeEl   = document.getElementById('activity-login-time');
+  const joinedTimeEl  = document.getElementById('activity-joined-time');
+  const memRow        = document.getElementById('activity-membership-row');
+  const memText       = document.getElementById('activity-membership-text');
+  const memTimeEl     = document.getElementById('activity-membership-time');
+
+  if (loginTimeEl)  loginTimeEl.textContent  = 'Just now — ' + new Date().toLocaleTimeString('en-IN');
+  if (joinedTimeEl) joinedTimeEl.textContent  = session.joinedDate || '—';
+
+  if (session.memberId || session.volunteerId) {
+    if (memRow)   memRow.style.display = 'flex';
+    if (memText)  memText.textContent  =
+      session.membershipType === 'volunteer'
+        ? 'Registered as a Volunteer.'
+        : `Registered as ${session.membershipType === 'active' ? 'Active' : 'General'} Member.`;
+    if (memTimeEl) memTimeEl.textContent = session.joinedDate || '—';
+  }
+
+  // Populate quick stats
+  const statusStatEl = document.getElementById('dash-status-stat');
+  const joinedStatEl = document.getElementById('dash-joined-stat');
+  const typeStatEl   = document.getElementById('dash-type-stat');
+
+  if (statusStatEl) {
+    const hasMem = session.memberId || session.volunteerId;
+    statusStatEl.innerHTML = hasMem
+      ? '<span class="badge-active">✓ Active</span>'
+      : '<span class="badge-registered">● Registered</span>';
+  }
+  if (joinedStatEl) joinedStatEl.textContent = session.joinedDate || '—';
+  if (typeStatEl) {
+    const labels = { general: 'General', active: 'Active', volunteer: 'Volunteer' };
+    typeStatEl.textContent = labels[session.membershipType] || 'Not yet joined';
+  }
+}
+</script>
+</body>
+</html>
