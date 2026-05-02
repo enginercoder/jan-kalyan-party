@@ -11,7 +11,7 @@
    DONATION CONFIG
    ================================================================ */
 const DONATION_CONFIG = {
-  upiId       : 'jankalyanparty@upi',
+  upiId       : 'jankalyanparty@sbi',
   partyName   : 'Jan Kalyan Party',
   phone       : '7376409590',
   email       : 'jankalyanpartyofficial@gmail.com',
