@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact Jan Kalyan Party — Reach out to us via phone, email, or visit our party headquarter. Connect on social media @jankalyanparty.">
+  <meta name="keywords" content="Contact Jan Kalyan Party, JKP office, party headquarter, reach us">
+  <title>Contact Us — Jan Kalyan Party</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ---- Contact Layout ---- */
+    .contact-page-grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 36px;
+      align-items: start;
+    }
+
+    /* ---- Contact Form Card ---- */
+    .contact-form-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .contact-form-head {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      padding: 28px 32px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-form-head::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 40%, rgba(255,107,0,0.14), transparent 55%);
+    }
+    .contact-form-head-title {
+      font-size: 1.3rem; font-weight: 800;
+      position: relative; z-index: 1;
+    }
+    .contact-form-head-sub {
+      font-size: 0.80rem; opacity: 0.80;
+      margin-top: 4px;
+      position: relative; z-index: 1;
+    }
+    .contact-form-body { padding: 30px 32px; }
+
+    /* ---- Inquiry Type Selector ---- */
+    .inquiry-types {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .inquiry-btn {
+      padding: 8px 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: 50px;
+      background: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      color: var(--text-dark);
+    }
+    .inquiry-btn:hover,
+    .inquiry-btn.active {
+      border-color: var(--orange);
+      background: var(--orange);
+      color: white;
+    }
+
+    /* ---- Contact Info Sidebar ---- */
+    .contact-sidebar { position: sticky; top: 90px; }
+    .contact-info-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+    .contact-info-card-head {
+      background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+      padding: 16px 20px;
+      color: white;
+      font-size: 0.90rem;
+      font-weight: 700;
+    }
+    .contact-info-card-body { padding: 18px 20px; }
+    .contact-detail-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .contact-detail-row:last-child { border-bottom: none; }
+    .contact-detail-icon {
+      width: 38px; height: 38px;
+      background: var(--orange-pale);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; flex-shrink: 0;
+      color: var(--orange);
+    }
+    .contact-detail-label {
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 3px;
+    }
+    .contact-detail-val {
+      font-size: 0.86rem; font-weight: 600;
+      color: var(--text-dark); line-height: 1.45;
+    }
+    .contact-detail-val a { color: var(--text-dark); }
+    .contact-detail-val a:hover { color: var(--orange); }
+
+    /* ---- Social Media Card ---- */
+    .social-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+    .social-card-head {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      padding: 16px 20px;
+      color: white;
+      font-size: 0.90rem; font-weight: 700;
+    }
+    .social-card-body { padding: 18px 20px; }
+    .social-links-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .social-link-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: white;
+      text-decoration: none;
+      color: var(--text-dark);
+      font-size: 0.80rem; font-weight: 600;
+      transition: var(--transition);
+    }
+    .social-link-btn:hover {
+      border-color: var(--orange);
+      background: var(--orange-pale);
+      color: var(--orange);
+      transform: translateY(-2px);
+    }
+    .social-link-icon {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .social-link-icon.fb    { background: #1877F2; color: white; }
+    .social-link-icon.tw    { background: #000;    color: white; }
+    .social-link-icon.ig    { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color: white; }
+    .social-link-icon.yt    { background: #FF0000; color: white; }
+    .social-link-icon.wa    { background: #25D366; color: white; }
+    .social-link-icon.tg    { background: #2CA5E0; color: white; }
+
+    /* ---- Map ---- */
+    .map-section { background: var(--off-white); }
+    .map-wrap {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      height: 420px;
+      margin-top: 40px;
+    }
+    .map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    /* ---- Success Message ---- */
+    .contact-success {
+      display: none;
+      text-align: center;
+      padding: 24px 0;
+    }
+    .contact-success.show { display: block; }
+
+    /* ---- Office Hours ---- */
+    .hours-grid {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .hours-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.82rem; padding: 6px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .hours-row:last-child { border-bottom: none; }
+    .hours-day  { color: var(--gray-600); font-weight: 500; }
+    .hours-time { font-weight: 700; color: var(--text-dark); }
+    .hours-closed { color: #e53935; }
+
+    /* ---- Departments ---- */
+    .dept-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 20px;
+      margin-top: 50px;
+    }
+    .dept-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 24px 20px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+      transition: var(--transition);
+      border-top: 3px solid transparent;
+    }
+    .dept-card:hover {
+      border-top-color: var(--orange);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+    }
+    .dept-icon  { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .dept-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+    .dept-email { font-size: 0.78rem; color: var(--orange); margin-top: 4px; }
+    .dept-desc  { font-size: 0.78rem; color: var(--gray-600); line-height: 1.65; margin-top: 6px; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .contact-page-grid { grid-template-columns: 1fr; }
+      .contact-sidebar { position: static; }
+    }
+    @media (max-width: 768px) {
+      .contact-form-body { padding: 22px 18px; }
+      .contact-form-head { padding: 22px 18px 16px; }
+      .dept-grid { grid-template-columns: 1fr 1fr; }
+      .map-wrap  { height: 300px; }
+    }
+    @media (max-width: 500px) {
+      .dept-grid          { grid-template-columns: 1fr; }
+      .social-links-grid  { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ===== TOP BAR ===== -->
+<div class="top-bar">
+  <div class="container top-bar-inner">
+    <div class="top-bar-left">
+      <a href="mailto:jankalyanpartyofficial@gmail.com"><i class="fa fa-envelope"></i> jankalyanpartyofficial@gmail.com</a>
+      <a href="tel:+917376409590"><i class="fa fa-phone"></i> +91 7376409590</a>
+    </div>
+    <div class="top-bar-right">
+      <a href="https://facebook.com/jankalyanparty"  target="_blank" rel="noopener" class="top-bar-social">f</a>
+      <a href="https://twitter.com/jankalyanparty"   target="_blank" rel="noopener" class="top-bar-social">𝕏</a>
+      <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="top-bar-social">in</a>
+      <a href="https://youtube.com/@jankalyanparty"  target="_blank" rel="noopener" class="top-bar-social">▶</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+      <div class="nav-logo-text">
+        <div class="party-name">Jan Kalyan Party</div>
+        <div class="party-slogan">जात पर न पात पर, प्राथमिकता विकास पर</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="membership.html">Membership</a></li>
+      <li><a href="donation.html">Donate</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="donation.html"    class="btn btn-outline-orange btn-sm">💛 Donate</a>
+      <a href="member-area.html" class="btn btn-orange btn-sm">👤 Member Login</a>
+    </div>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===== MOBILE NAV ===== -->
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <ul class="mobile-nav-links">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="about.html">🏛️ About</a></li>
+    <li><a href="membership.html">🪪 Membership</a></li>
+    <li><a href="donation.html">💛 Donate</a></li>
+    <li><a href="contact.html">📞 Contact</a></li>
+  </ul>
+  <div class="mobile-nav-actions">
+    <a href="member-area.html" class="btn btn-orange btn-full">👤 Member Login / Register</a>
+    <a href="donation.html"    class="btn btn-outline-orange btn-full">💛 Donate Now</a>
+  </div>
+</nav>
+
+<!-- ===== PAGE HERO ===== -->
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-hero-title">Contact Jan Kalyan Party</h1>
+    <div class="page-hero-crumb">
+      <a href="index.html">Home</a> <span>›</span> <span>Contact</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT MAIN ===== -->
+<section class="section-pad" style="background:var(--off-white);">
+  <div class="container">
+    <div class="contact-page-grid">
+
+      <!-- ===== LEFT: CONTACT FORM ===== -->
+      <div>
+        <div class="contact-form-card">
+          <div class="contact-form-head">
+            <div class="contact-form-head-title">📨 Send Us a Message</div>
+            <div class="contact-form-head-sub">We typically respond within 24–48 hours.</div>
+          </div>
+          <div class="contact-form-body">
+
+            <!-- Inquiry Types -->
+            <div style="margin-bottom:18px;">
+              <span class="amount-label" style="font-size:0.83rem;font-weight:700;color:var(--text-dark);display:block;margin-bottom:10px;">
+                What is your query about?
+              </span>
+              <div class="inquiry-types">
+                <button class="inquiry-btn active" data-type="General Inquiry">💬 General</button>
+                <button class="inquiry-btn" data-type="Membership Query">🪪 Membership</button>
+                <button class="inquiry-btn" data-type="Donation Query">💛 Donation</button>
+                <button class="inquiry-btn" data-type="Volunteer">🙋 Volunteer</button>
+                <button class="inquiry-btn" data-type="Media / Press">📰 Media</button>
+                <button class="inquiry-btn" data-type="Complaint / Grievance">📢 Grievance</button>
+              </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div id="contact-form-container">
+              <form id="contact-form" data-protected novalidate autocomplete="off">
+                <input type="hidden" name="inquiry_type" id="inquiry_type_field" value="General Inquiry">
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Full Name <span class="req">*</span></label>
+                    <input type="text" name="contact_name" class="form-control"
+                           placeholder="Your full name" maxlength="100">
+                    <div class="form-error"></div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Mobile Number <span class="req">*</span></label>
+                    <input type="tel" name="contact_phone" class="form-control"
+                           placeholder="10-digit mobile" maxlength="10">
+                    <div class="form-error"></div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Email Address <span class="req">*</span></label>
+                  <input type="email" name="contact_email" class="form-control"
+                         placeholder="yourname@email.com" maxlength="254">
+                  <div class="form-error"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">State</label>
+                  <select name="contact_state" class="form-control">
+                    <option value="">Select your state (optional)</option>
+                  </select>
+                  <div class="form-error"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Subject <span class="req">*</span></label>
+                  <input type="text" name="contact_subject" class="form-control"
+                         placeholder="Brief subject of your message" maxlength="150">
+                  <div class="form-error"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Your Message <span class="req">*</span></label>
+                  <textarea name="contact_message" class="form-control" rows="5"
+                    placeholder="Write your message here..." maxlength="2000"
+                    style="resize:vertical;"></textarea>
+                  <div class="form-error"></div>
+                  <div style="font-size:0.70rem;color:var(--gray-400);text-align:right;margin-top:3px;">
+                    <span id="char-count">0</span>/2000
+                  </div>
+                </div>
+
+                <div class="form-check">
+                  <input type="checkbox" name="contact_agree" id="contact-agree">
+                  <label class="form-check-label" for="contact-agree">
+                    I agree that Jan Kalyan Party may contact me regarding my query
+                    via the email and phone number provided.
+                  </label>
+                </div>
+
+                <button type="submit" class="btn btn-blue btn-full" style="margin-top:18px;">
+                  📨 Send Message
+                </button>
+              </form>
+
+              <!-- Success State -->
+              <div class="contact-success" id="contact-success">
+                <div class="success-icon">✅</div>
+                <div class="success-title">Message Sent!</div>
+                <div class="success-desc">
+                  Thank you for reaching out. We have received your message and will
+                  respond to you within 24–48 hours on your email or mobile number.
+                </div>
+                <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                  <button class="btn btn-blue btn-sm" onclick="resetContactForm()">📨 Send Another Message</button>
+                  <a href="index.html" class="btn btn-outline-orange btn-sm">🏠 Back to Home</a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== RIGHT: SIDEBAR ===== -->
+      <div class="contact-sidebar">
+
+        <!-- Contact Details -->
+        <div class="contact-info-card">
+          <div class="contact-info-card-head">📋 Contact Information</div>
+          <div class="contact-info-card-body">
+            <div class="contact-detail-row">
+              <div class="contact-detail-icon">📞</div>
+              <div>
+                <div class="contact-detail-label">Phone / WhatsApp</div>
+                <div class="contact-detail-val">
+                  <a href="tel:+917376409590">+91 7376409590</a>
+                </div>
+              </div>
+            </div>
+            <div class="contact-detail-row">
+              <div class="contact-detail-icon">📧</div>
+              <div>
+                <div class="contact-detail-label">Official Email</div>
+                <div class="contact-detail-val">
+                  <a href="mailto:jankalyanpartyofficial@gmail.com">
+                    jankalyanpartyofficial@gmail.com
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="contact-detail-row">
+              <div class="contact-detail-icon">📍</div>
+              <div>
+                <div class="contact-detail-label">Party Headquarter</div>
+                <div class="contact-detail-val">
+                  Jan Kalyan Party Headquarter<br>
+                  <a href="https://share.google/KyoKSpWBsUGOAfJzn" target="_blank" rel="noopener"
+                     style="color:var(--orange);font-size:0.78rem;">
+                    📍 View on Google Maps →
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="contact-detail-row">
+              <div class="contact-detail-icon">👤</div>
+              <div>
+                <div class="contact-detail-label">Party President</div>
+                <div class="contact-detail-val">Mr. Lal Bahadur Pal<br>
+                  <span style="font-size:0.76rem;color:var(--gray-400);">Founder & President</span>
+                </div>
+              </div>
+            </div>
+            <div class="contact-detail-row">
+              <div class="contact-detail-icon">📱</div>
+              <div>
+                <div class="contact-detail-label">Social Media</div>
+                <div class="contact-detail-val">@jankalyanparty</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Office Hours -->
+        <div class="contact-info-card">
+          <div class="contact-info-card-head">🕐 Office Hours</div>
+          <div class="contact-info-card-body">
+            <div class="hours-grid">
+              <div class="hours-row">
+                <span class="hours-day">Monday – Friday</span>
+                <span class="hours-time">10:00 AM – 6:00 PM</span>
+              </div>
+              <div class="hours-row">
+                <span class="hours-day">Saturday</span>
+                <span class="hours-time">10:00 AM – 2:00 PM</span>
+              </div>
+              <div class="hours-row">
+                <span class="hours-day">Sunday</span>
+                <span class="hours-time hours-closed">Closed</span>
+              </div>
+              <div class="hours-row">
+                <span class="hours-day">Public Holidays</span>
+                <span class="hours-time hours-closed">Closed</span>
+              </div>
+            </div>
+            <div style="background:var(--orange-pale);border-radius:var(--radius-sm);padding:10px 12px;margin-top:12px;font-size:0.76rem;color:var(--orange-dark);font-weight:600;">
+              ⚡ For urgent matters, WhatsApp us at +91 7376409590
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Media -->
+        <div class="social-card">
+          <div class="social-card-head">🌐 Follow Us</div>
+          <div class="social-card-body">
+            <div class="social-links-grid">
+              <a href="https://facebook.com/jankalyanparty" target="_blank" rel="noopener" class="social-link-btn">
+                <div class="social-link-icon fb">f</div>
+                <span>Facebook</span>
+              </a>
+              <a href="https://twitter.com/jankalyanparty" target="_blank" rel="noopener" class="social-link-btn">
+                <div class="social-link-icon tw">𝕏</div>
+                <span>Twitter / X</span>
+              </a>
+              <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="social-link-btn">
+                <div class="social-link-icon ig">📸</div>
+                <span>Instagram</span>
+              </a>
+              <a href="https://youtube.com/@jankalyanparty" target="_blank" rel="noopener" class="social-link-btn">
+                <div class="social-link-icon yt">▶</div>
+                <span>YouTube</span>
+              </a>
+              <a href="https://wa.me/917376409590" target="_blank" rel="noopener" class="social-link-btn">
+                <div class="social-link-icon wa">💬</div>
+                <span>WhatsApp</span>
+              </a>
+              <a href="https://t.me/jankalyanparty" target="_blank" rel="noopener" class="social-link-btn">
+                <div class="social-link-icon tg">✈️</div>
+                <span>Telegram</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GOOGLE MAP ===== -->
+<section class="section-pad map-section" id="map">
+  <div class="container text-center">
+    <span class="section-label">Find Us</span>
+    <h2 class="section-title">Party <span>Headquarter</span></h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">
+      Visit us at the Jan Kalyan Party Headquarter. Click the map to get directions.
+    </p>
+
+    <div class="map-wrap reveal">
+      <iframe
+        src="https://maps.google.com/maps?q=Jan+Kalyan+Party+Headquarter&output=embed&z=14"
+        allowfullscreen
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Jan Kalyan Party Headquarter Location">
+      </iframe>
+    </div>
+
+    <div style="margin-top:20px;">
+      <a href="https://share.google/KyoKSpWBsUGOAfJzn"
+         target="_blank" rel="noopener"
+         class="btn btn-orange btn-lg">
+        📍 Open in Google Maps
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DEPARTMENTS ===== -->
+<section class="section-pad" style="background:var(--gray-100);">
+  <div class="container text-center">
+    <span class="section-label">Get in Touch</span>
+    <h2 class="section-title">Contact the Right <span>Department</span></h2>
+    <div class="section-divider"></div>
+    <p class="section-subtitle">
+      Reach the appropriate department directly for a faster response to your query.
+    </p>
+
+    <div class="dept-grid" data-stagger="80">
+      <div class="dept-card reveal">
+        <span class="dept-icon">🪪</span>
+        <div class="dept-title">Membership Department</div>
+        <div class="dept-email">jankalyanpartyofficial@gmail.com</div>
+        <div class="dept-desc">For membership registration queries, ID card issues, and member portal help.</div>
+      </div>
+      <div class="dept-card reveal">
+        <span class="dept-icon">💛</span>
+        <div class="dept-title">Donations & Finance</div>
+        <div class="dept-email">jankalyanpartyofficial@gmail.com</div>
+        <div class="dept-desc">For donation receipts, tax certificates, and financial contribution queries.</div>
+      </div>
+      <div class="dept-card reveal">
+        <span class="dept-icon">📰</span>
+        <div class="dept-title">Media & Press</div>
+        <div class="dept-email">jankalyanpartyofficial@gmail.com</div>
+        <div class="dept-desc">For press releases, interview requests, and media collaboration enquiries.</div>
+      </div>
+      <div class="dept-card reveal">
+        <span class="dept-icon">🙋</span>
+        <div class="dept-title">Volunteer Coordination</div>
+        <div class="dept-email">jankalyanpartyofficial@gmail.com</div>
+        <div class="dept-desc">For volunteer opportunities, training programmes, and community service campaigns.</div>
+      </div>
+      <div class="dept-card reveal">
+        <span class="dept-icon">📢</span>
+        <div class="dept-title">Public Grievances</div>
+        <div class="dept-email">jankalyanpartyofficial@gmail.com</div>
+        <div class="dept-desc">For submitting public complaints, grievances, or suggestions to the party leadership.</div>
+      </div>
+      <div class="dept-card reveal">
+        <span class="dept-icon">🏛️</span>
+        <div class="dept-title">General Secretariat</div>
+        <div class="dept-email">jankalyanpartyofficial@gmail.com</div>
+        <div class="dept-desc">For all other correspondence, event invitations, and general party communication.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== JOIN CTA ===== -->
+<section style="background:linear-gradient(135deg,var(--orange),var(--orange-dark));padding:56px 0;text-align:center;">
+  <div class="container">
+    <h2 style="color:white;font-size:clamp(1.4rem,3.5vw,2.2rem);font-weight:800;margin-bottom:10px;">
+      Ready to Join Jan Kalyan Party?
+    </h2>
+    <p class="hindi" style="color:rgba(255,255,255,0.85);font-size:0.98rem;margin-bottom:26px;">
+      देश बदलने का सफर शुरू करें — जन कल्याण पार्टी से जुड़ें
+    </p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="membership.html" class="btn btn-lg" style="background:white;color:var(--orange);">🪪 Join the Party</a>
+      <a href="donation.html"   class="btn btn-outline-white btn-lg">💛 Donate Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
+          <div>
+            <div class="footer-brand-name">Jan Kalyan Party</div>
+            <div class="footer-brand-slogan hindi">जात पर न पात पर, प्राथमिकता विकास पर</div>
+          </div>
+        </div>
+        <p class="footer-desc">Jan Kalyan Party is committed to inclusive development, social justice, and the welfare of every citizen of India.</p>
+        <div class="footer-socials">
+          <a href="https://facebook.com/jankalyanparty"  target="_blank" rel="noopener" class="footer-social-btn">f</a>
+          <a href="https://twitter.com/jankalyanparty"   target="_blank" rel="noopener" class="footer-social-btn">𝕏</a>
+          <a href="https://instagram.com/jankalyanparty" target="_blank" rel="noopener" class="footer-social-btn">in</a>
+          <a href="https://youtube.com/@jankalyanparty"  target="_blank" rel="noopener" class="footer-social-btn">▶</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Party</a></li>
+          <li><a href="membership.html">Membership</a></li>
+          <li><a href="donation.html">Donate</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Membership</div>
+        <ul class="footer-links">
+          <li><a href="membership.html#general">General Member</a></li>
+          <li><a href="membership.html#active">Active Member</a></li>
+          <li><a href="membership.html#volunteer">Volunteer</a></li>
+          <li><a href="member-area.html">Member Login</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-links">
+          <li><a href="mailto:jankalyanpartyofficial@gmail.com">📧 jankalyanpartyofficial@gmail.com</a></li>
+          <li><a href="tel:+917376409590">📞 +91 7376409590</a></li>
+          <li><a href="#map">📍 Party Headquarter</a></li>
+          <li><a href="https://wa.me/917376409590" target="_blank" rel="noopener">💬 WhatsApp Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Jan Kalyan Party. All rights reserved.</span>
+      <span><a href="#">Privacy Policy</a> &nbsp;|&nbsp; <a href="#">Terms of Use</a></span>
+      <span>Made with 🧡 for the People of India</span>
+    </div>
+  </div>
+</footer>
+
+<button id="back-to-top" aria-label="Back to top">↑</button>
+<div class="toast-wrap"></div>
+
+<!-- Scripts -->
+<script src="js/security.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* ---- Inquiry type selector ---- */
+  const inquiryBtns  = document.querySelectorAll('.inquiry-btn');
+  const inquiryField = document.getElementById('inquiry_type_field');
+
+  inquiryBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      inquiryBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (inquiryField) inquiryField.value = btn.dataset.type;
+    });
+  });
+
+  /* ---- Character counter ---- */
+  const msgTextarea = document.querySelector('[name="contact_message"]');
+  const charCount   = document.getElementById('char-count');
+  if (msgTextarea && charCount) {
+    msgTextarea.addEventListener('input', () => {
+      charCount.textContent = msgTextarea.value.length;
+    });
+  }
+
+  /* ---- Contact Form Submit ---- */
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    Validator.attachLiveClear(contactForm);
+    Honeypot.inject(contactForm);
+    SubmitTimeGuard.stamp(contactForm);
+
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Security checks
+      if (!Honeypot.check(contactForm)) {
+        Toast.show('Submission blocked. Please try again.', 'error');
+        return;
+      }
+      if (!RateLimiter.check('contact', 3, 60000)) {
+        Toast.show('Too many submissions. Please wait a minute.', 'error');
+        return;
+      }
+
+      // Validate
+      const rules = [
+        { field: 'contact_name',    required: true, minLength: 3, requiredMsg: 'Your name is required.' },
+        { field: 'contact_phone',   required: true, type: 'phone', requiredMsg: 'Mobile number is required.' },
+        { field: 'contact_email',   required: true, type: 'email', requiredMsg: 'Email address is required.' },
+        { field: 'contact_subject', required: true, minLength: 5, requiredMsg: 'Please enter a subject.' },
+        { field: 'contact_message', required: true, minLength: 20, requiredMsg: 'Please enter a message (min. 20 characters).' },
+      ];
+
+      if (!Validator.validate(contactForm, rules)) return;
+
+      const agree = contactForm.querySelector('[name="contact_agree"]');
+      if (!agree?.checked) {
+        Toast.show('Please agree to be contacted by Jan Kalyan Party.', 'error');
+        return;
+      }
+
+      // Lock button
+      const btn = contactForm.querySelector('[type="submit"]');
+      SubmitGuard.lockButton(btn, 'Sending...');
+
+      // Sanitize & save locally
+      const data = Sanitizer.cleanForm(contactForm);
+      const record = {
+        id          : 'MSG_' + Date.now(),
+        inquiryType : inquiryField?.value || 'General',
+        name        : Sanitizer.name(data.contact_name || ''),
+        email       : Sanitizer.email(data.contact_email || ''),
+        phone       : Sanitizer.phone(data.contact_phone || ''),
+        subject     : Sanitizer.clean(data.contact_subject || '', { maxLength: 150 }),
+        message     : Sanitizer.clean(data.contact_message || '', { maxLength: 2000 }),
+        state       : Sanitizer.clean(data.contact_state || '', { maxLength: 60 }),
+        timestamp   : Date.now(),
+        date        : formatDate(),
+      };
+
+      // Store message
+      const messages = SecureStore.get('contact_messages') || [];
+      messages.push(record);
+      SecureStore.set('contact_messages', messages);
+
+      // Simulate sending (500ms delay)
+      await new Promise(r => setTimeout(r, 500));
+
+      // Show success
+      contactForm.style.display = 'none';
+      document.getElementById('contact-success').classList.add('show');
+      Toast.show('Message sent successfully!', 'success');
+    });
+  }
+});
+
+/* ---- Reset contact form ---- */
+function resetContactForm() {
+  const form    = document.getElementById('contact-form');
+  const success = document.getElementById('contact-success');
+  if (form)    { form.reset(); form.style.display = ''; }
+  if (success) success.classList.remove('show');
+  if (document.getElementById('char-count')) {
+    document.getElementById('char-count').textContent = '0';
+  }
+  // Reset inquiry type
+  document.querySelectorAll('.inquiry-btn').forEach((b,i) => {
+    b.classList.toggle('active', i === 0);
+  });
+  RateLimiter.reset('contact');
+}
+</script>
+</body>
+</html>
