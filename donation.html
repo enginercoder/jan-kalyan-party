@@ -457,7 +457,7 @@
                   <p style="font-size:0.82rem;color:var(--gray-600);margin-bottom:8px;">
                     Scan & Pay or use UPI ID:
                   </p>
-                  <div class="upi-id-display upi-id-text">jankalyanparty@sbi</div>
+                  <div class="upi-id-display upi-id-text">jankalyanparty@upi</div>
                   <br>
                   <button class="copy-btn" style="margin-top:10px;">📋 Copy UPI ID</button>
 
@@ -826,7 +826,7 @@
   /* ---- Open UPI App ---- */
   function openUPIApp(app) {
     const amt    = document.getElementById('don_amount_hidden')?.value || '';
-    const upiId  = 'jankalyanparty@sbi';
+    const upiId  = 'jankalyanparty@upi';
     const name   = encodeURIComponent('Jan Kalyan Party');
     const note   = encodeURIComponent('JKP Donation');
     const link   = `upi://pay?pa=${upiId}&pn=${name}&am=${amt}&cu=INR&tn=${note}`;
