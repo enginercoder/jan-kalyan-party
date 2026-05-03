@@ -137,6 +137,65 @@
     .active-step-num { width:28px; height:28px; background:var(--orange); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:800; flex-shrink:0; }
     .active-step-text { font-size:0.84rem; color:var(--text-mid); line-height:1.5; }
 
+    /* Step Indicator */
+    .mem-steps {
+      display:flex; align-items:center; justify-content:center;
+      gap:0; margin-bottom:40px; max-width:560px; margin-left:auto; margin-right:auto;
+    }
+    .mem-step-item {
+      display:flex; align-items:center; gap:8px; flex:1; position:relative;
+    }
+    .mem-step-item::after {
+      content:''; flex:1; height:2px;
+      background:var(--gray-200); transition:var(--transition);
+    }
+    .mem-step-item:last-child::after { display:none; }
+    .mem-step-item.done::after { background:var(--orange); }
+    .mem-step-num {
+      width:32px; height:32px; border-radius:50%;
+      background:var(--gray-200); color:var(--gray-600);
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.80rem; font-weight:800; flex-shrink:0;
+      transition:var(--transition);
+    }
+    .mem-step-item.active .mem-step-num { background:var(--orange); color:white; box-shadow:0 0 0 4px rgba(255,107,0,0.15); }
+    .mem-step-item.done   .mem-step-num { background:#4CAF50; color:white; }
+    .mem-step-label {
+      font-size:0.72rem; font-weight:600; color:var(--gray-400); white-space:nowrap;
+    }
+    .mem-step-item.active .mem-step-label { color:var(--orange); }
+    .mem-step-item.done   .mem-step-label { color:#4CAF50; }
+
+    /* Step panels */
+    .step-panel { display:none; }
+    .step-panel.active { display:block; }
+
+    /* Step 3 summary card */
+    .summary-card {
+      background:var(--white); border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-md); overflow:hidden;
+      max-width:720px; margin:0 auto;
+    }
+    .summary-head {
+      background:linear-gradient(135deg,#0D47A1,#1565C0);
+      padding:24px 32px; color:white;
+    }
+    .summary-head-title { font-size:1.25rem; font-weight:800; }
+    .summary-head-sub   { font-size:0.80rem; opacity:0.80; margin-top:4px; }
+    .summary-body { padding:28px 32px; }
+    .summary-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 0; border-bottom:1px solid var(--gray-100); font-size:0.86rem;
+    }
+    .summary-row:last-child { border-bottom:none; }
+    .summary-label { color:var(--gray-600); }
+    .summary-val   { font-weight:700; color:var(--text-dark); }
+    .payment-done-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      background:#E8F5E9; color:#2E7D32;
+      font-size:0.78rem; font-weight:700; padding:4px 14px; border-radius:50px;
+    }
+
     /* FAQ */
     .faq-list { max-width:720px; margin:44px auto 0; }
     .faq-item { border:1px solid var(--gray-200); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:10px; }
@@ -295,9 +354,25 @@
       <span class="section-label">Step 2 — Fill Your Details</span>
     </div>
 
-    <!-- ============================
-         GENERAL MEMBER FORM
-         ============================ -->
+    <!-- STEP INDICATOR — shown for General Member flow -->
+    <div id="general-step-indicator" style="display:none;margin-bottom:32px;">
+      <div class="mem-steps">
+        <div class="mem-step-item" id="step-ind-1">
+          <div class="mem-step-num">1</div>
+          <div class="mem-step-label">Your Details</div>
+        </div>
+        <div class="mem-step-item" id="step-ind-2">
+          <div class="mem-step-num">2</div>
+          <div class="mem-step-label">Pay Fee</div>
+        </div>
+        <div class="mem-step-item" id="step-ind-3">
+          <div class="mem-step-num">3</div>
+          <div class="mem-step-label">Get ID Card</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERAL MEMBER FORM -->
     <div class="form-panel" id="panel-general">
       <div class="form-card">
         <div class="form-card-header blue">
@@ -443,7 +518,7 @@
             </div>
 
             <button type="submit" class="btn btn-blue btn-full" style="margin-top:22px;font-size:1rem;">
-              🪪 Register as General Member
+              💳 Proceed to Payment → Step 2
             </button>
           </form>
         </div>
@@ -652,7 +727,92 @@
       </div>
     </div>
 
-  </div>
+    <!-- STEP INDICATOR (General Member flow only) -->
+    <div id="general-step-indicator" style="display:none;margin-bottom:36px;">
+      <div class="mem-steps">
+        <div class="mem-step-item active" id="step-ind-1">
+          <div class="mem-step-num">1</div>
+          <div class="mem-step-label">Your Details</div>
+        </div>
+        <div class="mem-step-item" id="step-ind-2">
+          <div class="mem-step-num">2</div>
+          <div class="mem-step-label">Pay Fee</div>
+        </div>
+        <div class="mem-step-item" id="step-ind-3">
+          <div class="mem-step-num">3</div>
+          <div class="mem-step-label">Get ID Card</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Confirm & Generate ID Card (after returning from payment) -->
+    <div class="form-panel" id="panel-step3">
+      <div class="summary-card">
+        <div class="summary-head">
+          <div class="summary-head-title">✅ Step 3 — Confirm & Get Your ID Card</div>
+          <div class="summary-head-sub">Payment received. Please review your details and confirm membership.</div>
+        </div>
+        <div class="summary-body">
+
+          <!-- Payment confirmed badge -->
+          <div style="text-align:center;margin-bottom:22px;">
+            <div class="payment-done-badge">
+              ✅ Annual Fee Payment Confirmed
+            </div>
+          </div>
+
+          <!-- Summary rows -->
+          <div class="summary-row">
+            <span class="summary-label">Full Name</span>
+            <span class="summary-val" id="s3-name">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Mobile Number</span>
+            <span class="summary-val" id="s3-phone">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Email</span>
+            <span class="summary-val" id="s3-email">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">State</span>
+            <span class="summary-val" id="s3-state">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">District</span>
+            <span class="summary-val" id="s3-district">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Annual Fee Paid</span>
+            <span class="summary-val" id="s3-fee">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Membership Tenure</span>
+            <span class="summary-val" id="s3-tenure">3 Years (1st April – 31st March)</span>
+          </div>
+
+          <div style="background:var(--blue-pale);border-radius:var(--radius-sm);
+               padding:12px 16px;margin:18px 0;font-size:0.82rem;color:var(--blue-dark);">
+            ℹ️ By confirming, your <strong>General Member ID card</strong> will be generated.
+            Save or print it immediately — your Membership ID is your login key.
+          </div>
+
+          <button id="confirm-membership-btn" class="btn btn-orange btn-full" style="font-size:1rem;">
+            🪪 Confirm & Generate My Membership ID Card
+          </button>
+
+          <button onclick="clearDraftMembership(); window.location.href='membership.html';"
+                  class="btn btn-outline-orange btn-sm btn-full" style="margin-top:10px;">
+            ✕ Cancel & Start Over
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    </div><!-- end panel-step3 -->
+
+  </div><!-- end container -->
 </section>
 
 <!-- SUCCESS POPUP MODAL -->
@@ -836,17 +996,30 @@
     });
   });
 
-  // Fee: no negatives
+  // Fee: digits only, no negatives
   document.querySelectorAll('input[name="mem_fee"]').forEach(el => {
     el.addEventListener('input', () => {
-      if (parseInt(el.value) < 0) el.value = '';
+      el.value = el.value.replace(/[^0-9]/g,'');
     });
   });
+
+  // Step indicator helper
+  function setStepActive(n) {
+    const ind = document.getElementById('general-step-indicator');
+    if (ind) ind.style.display = 'flex';
+    [1,2,3].forEach(i => {
+      const el = document.getElementById('step-ind-' + i);
+      if (!el) return;
+      el.classList.toggle('active', i === n);
+      el.classList.toggle('done',   i < n);
+    });
+  }
 
   // Type selector
   const typeBtns  = document.querySelectorAll('.mem-type-btn');
   const panels    = document.querySelectorAll('.form-panel');
   const stepLabel = document.getElementById('form-step-label');
+  const stepInd   = document.getElementById('general-step-indicator');
 
   typeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -859,12 +1032,34 @@
         target.classList.add('active');
         setTimeout(() => target.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
       }
+      // Show/hide step indicator
+      if (stepInd) stepInd.style.display = type === 'general' ? 'flex' : 'none';
+      if (type === 'general') setStepActive(1);
       if (stepLabel) stepLabel.style.display = type === 'active-info' ? 'none' : 'block';
     });
   });
 
-  // Hash links
+  // Check if returning from donation page (step 3)
   window.addEventListener('load', () => {
+    const draft = getDraftMembership();
+
+    // Returning from payment — show step 3
+    if (draft && draft.paymentDone) {
+      panels.forEach(p => p.classList.remove('active'));
+      const step3 = document.getElementById('panel-step3');
+      if (step3) step3.classList.add('active');
+      if (stepInd) stepInd.style.display = 'flex';
+      setStepActive(3);
+      populateStep3(draft);
+      // Update tenure display
+      const tenureEl = document.getElementById('s3-tenure');
+      if (tenureEl && typeof TenureCalc !== 'undefined') {
+        tenureEl.textContent = TenureCalc.formatTenure().display;
+      }
+      return;
+    }
+
+    // Hash links
     const hash = window.location.hash.replace('#','');
     const map  = { general:'general', volunteer:'volunteer', active:'active-info' };
     if (map[hash]) {
