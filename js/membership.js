@@ -1,18 +1,68 @@
 /* ================================================================
-   JAN KALYAN PARTY — membership.js
-   Handles: General Member, Active Member, Volunteer registration,
-            Unique ID generation, ID card rendering, form flows
-   Depends on: main.js, security.js, auth.js
+   JAN KALYAN PARTY — membership.js (Updated)
+   Rules:
+   - Age: 18+ for all types
+   - General Member: Annual fee ₹10 minimum
+   - Active Member: Auto-upgrade after adding 25 General Members
+   - Tenure: 3 years, 1st April → 31st March
+   - Aadhaar: 12 digits only
+   - Email: Optional
+   - Address: Village/City → Block → Sub District → District → Full Address
    ================================================================ */
 
 'use strict';
 
 /* ================================================================
-   MEMBERSHIP ID GENERATOR
-   Format:
-     General Member  → JKP-GM-YYYY-XXXXXX
-     Active Member   → JKP-AM-YYYY-XXXXXX
-     Volunteer       → JKP-VOL-YYYY-XXXXXX
+   MEMBERSHIP TENURE CALCULATOR
+   Starts: 1st April of current year (or next year if past March)
+   Ends:   31st March, 3 years later
+   ================================================================ */
+const TenureCalc = (() => {
+
+  function getStartDate() {
+    const now   = new Date();
+    const month = now.getMonth(); // 0=Jan, 3=April
+    // If current month is Jan-March, start from April of THIS year
+    // else start from April of NEXT year
+    const startYear = month < 3 ? now.getFullYear() : now.getFullYear() + 1;
+    // But if we are already in April or later of current year, start NOW
+    // Simplified: always start from nearest 1st April
+    const nearest = new Date(now.getFullYear(), 3, 1); // April 1 this year
+    const start   = now >= nearest
+      ? new Date(now.getFullYear(), 3, 1)       // April 1 this year
+      : new Date(now.getFullYear() - 1, 3, 1);  // April 1 last year (already started)
+
+    return start;
+  }
+
+  function getEndDate(startDate) {
+    // 3 years from start, ending 31st March
+    return new Date(startDate.getFullYear() + 3, 2, 31); // March 31
+  }
+
+  function formatTenure() {
+    const start = getStartDate();
+    const end   = getEndDate(start);
+    const fmt   = (d) => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+    return {
+      start     : fmt(start),
+      end       : fmt(end),
+      startDate : start,
+      endDate   : end,
+      display   : `${fmt(start)} — ${fmt(end)}`
+    };
+  }
+
+  return { getStartDate, getEndDate, formatTenure };
+})();
+
+window.TenureCalc = TenureCalc;
+
+/* ================================================================
+   ID GENERATOR
+   General Member  → JKP-GM-YYYY-XXXXXX
+   Active Member   → JKP-AM-YYYY-XXXXXX
+   Volunteer       → JKP-VOL-YYYY-XXXXXX
    ================================================================ */
 const IDGenerator = (() => {
 
@@ -24,88 +74,90 @@ const IDGenerator = (() => {
 
   function markUsed(id) {
     const used = getUsedIDs();
-    used.push(id);
-    SecureStore.set(USED_KEY, used);
+    if (!used.includes(id)) {
+      used.push(id);
+      SecureStore.set(USED_KEY, used);
+    }
   }
 
   function isUsed(id) {
     return getUsedIDs().includes(id);
   }
 
-  function generate(type = 'GM') {
-    const year   = new Date().getFullYear();
+  function generate(prefix = 'GM') {
+    const year = new Date().getFullYear();
     let id;
-    // Keep generating until unique
     do {
       const random = Math.floor(100000 + Math.random() * 900000);
-      id = `JKP-${type}-${year}-${random}`;
+      id = `JKP-${prefix}-${year}-${random}`;
     } while (isUsed(id));
-
     markUsed(id);
     return id;
   }
 
-  function forType(membershipType) {
-    const typeMap = {
-      'general'   : 'GM',
-      'active'    : 'AM',
-      'volunteer' : 'VOL',
-    };
-    const code = typeMap[membershipType] || 'GM';
-    return generate(code);
+  function forType(type) {
+    const map = { general: 'GM', active: 'AM', volunteer: 'VOL' };
+    return generate(map[type] || 'GM');
   }
 
-  return { generate, forType };
+  function exists(id) {
+    // Check in all member stores
+    const users      = SecureStore.get('users') || [];
+    const standalone = SecureStore.get('standalone_members') || [];
+    const all        = [...users, ...standalone];
+    return all.some(u => u.memberId === id || u.volunteerId === id);
+  }
+
+  return { generate, forType, exists, isUsed };
 })();
 
 window.IDGenerator = IDGenerator;
 
 /* ================================================================
    ID CARD RENDERER
-   Builds the visual HTML membership card
    ================================================================ */
 const IDCardRenderer = (() => {
 
   const typeLabels = {
-    'general'   : 'General Member',
-    'active'    : 'Active Member',
-    'volunteer' : 'Volunteer',
+    general   : 'General Member',
+    active    : 'Active Member',
+    volunteer : 'Volunteer',
   };
 
   const typeColors = {
-    'general'   : 'linear-gradient(135deg, #1565C0, #1976D2)',
-    'active'    : 'linear-gradient(135deg, #E55A00, #FF6B00)',
-    'volunteer' : 'linear-gradient(135deg, #2E7D32, #388E3C)',
+    general   : 'linear-gradient(135deg, #1565C0, #1976D2)',
+    active    : 'linear-gradient(135deg, #E55A00, #FF6B00)',
+    volunteer : 'linear-gradient(135deg, #2E7D32, #388E3C)',
   };
 
   function render(data) {
     const {
       name, memberId, membershipType,
-      state, district, phone, email,
-      issuedDate
+      state, district, subDistrict, block, village,
+      issuedDate, tenureEnd, fee
     } = data;
 
-    const bgColor   = typeColors[membershipType]  || typeColors['general'];
-    const typeLabel = typeLabels[membershipType] || 'Member';
+    const bg    = typeColors[membershipType] || typeColors.general;
+    const label = typeLabels[membershipType] || 'Member';
 
     return `
-      <div class="id-card" style="background: ${bgColor};" id="rendered-id-card">
+      <div class="id-card" style="background:${bg};" id="rendered-id-card">
         <div class="id-card-top">
           <img src="assets/logo.png" alt="JKP Logo" onerror="this.style.display='none'">
           <div>
             <div class="id-card-pname">Jan Kalyan Party</div>
             <div class="id-card-pslogan">जात पर न पात पर, प्राथमिकता विकास पर</div>
           </div>
-          <div style="margin-left:auto; text-align:right;">
-            <div style="font-size:0.62rem; opacity:0.65; text-transform:uppercase; letter-spacing:1px;">Official</div>
-            <div style="font-size:0.75rem; font-weight:700;">Membership Card</div>
+          <div style="margin-left:auto;text-align:right;">
+            <div style="font-size:0.60rem;opacity:0.65;text-transform:uppercase;letter-spacing:1px;">Official</div>
+            <div style="font-size:0.72rem;font-weight:700;">Membership Card</div>
           </div>
         </div>
 
         <div class="id-card-hr"></div>
 
         <div class="id-card-name">${sanitizeHTML(name)}</div>
-        <div class="id-card-type">${typeLabel}</div>
+        <div class="id-card-type">${label}</div>
 
         <div class="id-card-row">
           <div class="id-card-field">
@@ -116,23 +168,26 @@ const IDCardRenderer = (() => {
             <label>State</label>
             <span>${sanitizeHTML(state || '—')}</span>
           </div>
-          ${district ? `
           <div class="id-card-field">
             <label>District</label>
-            <span>${sanitizeHTML(district)}</span>
-          </div>` : ''}
+            <span>${sanitizeHTML(district || '—')}</span>
+          </div>
         </div>
 
         <div class="id-card-row" style="margin-top:10px;">
-          ${phone ? `
-          <div class="id-card-field">
-            <label>Mobile</label>
-            <span>${sanitizeHTML(phone)}</span>
-          </div>` : ''}
           <div class="id-card-field">
             <label>Issue Date</label>
             <span>${sanitizeHTML(issuedDate)}</span>
           </div>
+          <div class="id-card-field">
+            <label>Valid Until</label>
+            <span>${sanitizeHTML(tenureEnd || '—')}</span>
+          </div>
+          ${fee ? `
+          <div class="id-card-field">
+            <label>Annual Fee</label>
+            <span>₹${sanitizeHTML(String(fee))}</span>
+          </div>` : ''}
         </div>
 
         <div class="id-card-hr" style="margin-top:14px;"></div>
@@ -149,140 +204,194 @@ const IDCardRenderer = (() => {
 window.IDCardRenderer = IDCardRenderer;
 
 /* ================================================================
-   MEMBERSHIP FORM HANDLER — General & Active Member
+   MEMBERSHIP FORM — General Member
    ================================================================ */
 const MembershipForm = (() => {
 
   async function submit(formEl, membershipType) {
 
-    // --- Security checks ---
+    // Security
     if (!Honeypot.check(formEl)) {
-      Toast.show('Submission blocked. Please try again.', 'error');
-      return false;
-    }
-    if (!SubmitTimeGuard.check(formEl)) {
-      Toast.show('Please take a moment to fill out the form carefully.', 'error');
-      return false;
+      Toast.show('Submission blocked. Please try again.', 'error'); return false;
     }
     if (!RateLimiter.check('membership', 3, 120000)) {
-      Toast.show('Too many attempts. Please wait 2 minutes.', 'error');
-      return false;
+      Toast.show('Too many attempts. Please wait 2 minutes.', 'error'); return false;
     }
 
-    // --- Get raw values ---
+    // Raw values
     const raw = {
-      name     : formEl.querySelector('[name="mem_name"]')?.value     || '',
-      email    : formEl.querySelector('[name="mem_email"]')?.value    || '',
-      phone    : formEl.querySelector('[name="mem_phone"]')?.value    || '',
-      dob      : formEl.querySelector('[name="mem_dob"]')?.value      || '',
-      gender   : formEl.querySelector('[name="mem_gender"]')?.value   || '',
-      aadhaar  : formEl.querySelector('[name="mem_aadhaar"]')?.value  || '',
-      state    : formEl.querySelector('[name="mem_state"]')?.value    || '',
-      district : formEl.querySelector('[name="mem_district"]')?.value || '',
-      address  : formEl.querySelector('[name="mem_address"]')?.value  || '',
-      agree    : formEl.querySelector('[name="mem_agree"]')?.checked  || false,
+      name        : formEl.querySelector('[name="mem_name"]')?.value        || '',
+      dob         : formEl.querySelector('[name="mem_dob"]')?.value         || '',
+      email       : formEl.querySelector('[name="mem_email"]')?.value       || '',
+      phone       : formEl.querySelector('[name="mem_phone"]')?.value       || '',
+      gender      : formEl.querySelector('[name="mem_gender"]')?.value      || '',
+      aadhaar     : formEl.querySelector('[name="mem_aadhaar"]')?.value     || '',
+      village     : formEl.querySelector('[name="mem_village"]')?.value     || '',
+      block       : formEl.querySelector('[name="mem_block"]')?.value       || '',
+      subDistrict : formEl.querySelector('[name="mem_sub_district"]')?.value|| '',
+      district    : formEl.querySelector('[name="mem_district"]')?.value    || '',
+      fullAddress : formEl.querySelector('[name="mem_full_address"]')?.value|| '',
+      state       : formEl.querySelector('[name="mem_state"]')?.value       || '',
+      fee         : formEl.querySelector('[name="mem_fee"]')?.value         || '',
+      agreeConst  : formEl.querySelector('[name="mem_agree_constitution"]')?.checked || false,
+      agreeTC     : formEl.querySelector('[name="mem_agree_tc"]')?.checked  || false,
     };
 
-    // --- Sanitize ---
+    // Sanitize
     const data = {
-      name     : Sanitizer.name(raw.name),
-      email    : Sanitizer.email(raw.email),
-      phone    : Sanitizer.phone(raw.phone),
-      dob      : Sanitizer.clean(raw.dob,      { maxLength: 20  }),
-      gender   : Sanitizer.clean(raw.gender,   { maxLength: 20  }),
-      aadhaar  : Sanitizer.aadhaar(raw.aadhaar),
-      state    : Sanitizer.clean(raw.state,    { maxLength: 60  }),
-      district : Sanitizer.clean(raw.district, { maxLength: 60  }),
-      address  : Sanitizer.clean(raw.address,  { maxLength: 300 }),
-      agree    : raw.agree,
+      name        : Sanitizer.name(raw.name),
+      dob         : Sanitizer.clean(raw.dob,         { maxLength: 20  }),
+      email       : raw.email ? Sanitizer.email(raw.email) : '',
+      phone       : Sanitizer.phone(raw.phone),
+      gender      : Sanitizer.clean(raw.gender,      { maxLength: 20  }),
+      aadhaar     : raw.aadhaar.replace(/\D/g, '').substring(0, 12),
+      village     : Sanitizer.clean(raw.village,     { maxLength: 100 }),
+      block       : Sanitizer.clean(raw.block,       { maxLength: 100 }),
+      subDistrict : Sanitizer.clean(raw.subDistrict, { maxLength: 100 }),
+      district    : Sanitizer.clean(raw.district,    { maxLength: 100 }),
+      fullAddress : Sanitizer.clean(raw.fullAddress, { maxLength: 400 }),
+      state       : Sanitizer.clean(raw.state,       { maxLength: 60  }),
+      fee         : parseInt(raw.fee) || 0,
+      agreeConst  : raw.agreeConst,
+      agreeTC     : raw.agreeTC,
     };
 
-    // --- Validate ---
+    // Validate required fields
     const rules = [
-      { field: 'mem_name',    required: true, minLength: 3, requiredMsg: 'Full name is required.' },
-      { field: 'mem_email',   required: true, type: 'email', requiredMsg: 'Email is required.' },
-      { field: 'mem_phone',   required: true, type: 'phone', requiredMsg: 'Mobile number is required.' },
-      { field: 'mem_dob',     required: true, requiredMsg: 'Date of birth is required.' },
-      { field: 'mem_gender',  required: true, requiredMsg: 'Please select gender.' },
-      { field: 'mem_aadhaar', required: true, type: 'aadhaar', requiredMsg: 'Aadhaar number is required.' },
-      { field: 'mem_state',   required: true, requiredMsg: 'Please select your state.' },
+      { field: 'mem_name',        required: true, minLength: 3,  requiredMsg: 'Full name is required.' },
+      { field: 'mem_dob',         required: true,                requiredMsg: 'Date of birth is required.' },
+      { field: 'mem_phone',       required: true, type: 'phone', requiredMsg: 'Mobile number is required.' },
+      { field: 'mem_gender',      required: true,                requiredMsg: 'Please select gender.' },
+      { field: 'mem_aadhaar',     required: true,                requiredMsg: 'Aadhaar number is required.' },
+      { field: 'mem_village',     required: true,                requiredMsg: 'Village / City is required.' },
+      { field: 'mem_block',       required: true,                requiredMsg: 'Block is required.' },
+      { field: 'mem_sub_district',required: true,                requiredMsg: 'Sub District is required.' },
+      { field: 'mem_district',    required: true,                requiredMsg: 'District is required.' },
+      { field: 'mem_full_address',required: true, minLength: 10, requiredMsg: 'Full address is required.' },
+      { field: 'mem_state',       required: true,                requiredMsg: 'Please select your state.' },
     ];
+
+    if (membershipType === 'general') {
+      rules.push({ field: 'mem_fee', required: true, requiredMsg: 'Annual fee is required.' });
+    }
 
     if (!Validator.validate(formEl, rules)) return false;
 
-    if (!data.agree) {
-      Toast.show('Please agree to the Terms & Conditions.', 'error');
-      return false;
-    }
-
-    // --- Age validation (must be 18+) ---
+    // Age check (18+)
     if (data.dob) {
-      const dob     = new Date(data.dob);
-      const today   = new Date();
-      const age     = today.getFullYear() - dob.getFullYear();
-      const monthOk = today.getMonth() > dob.getMonth() ||
-                      (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
-      const realAge = monthOk ? age : age - 1;
-
-      if (realAge < 18) {
-        const dobInput = formEl.querySelector('[name="mem_dob"]');
-        Validator.showError(dobInput, 'You must be at least 18 years old to register.');
+      const dob   = new Date(data.dob);
+      const today = new Date();
+      let age     = today.getFullYear() - dob.getFullYear();
+      const m     = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+      if (age < 18) {
+        Validator.showError(formEl.querySelector('[name="mem_dob"]'),
+          'You must be at least 18 years old to register.');
         return false;
       }
     }
 
-    // --- Generate membership ID ---
+    // Aadhaar must be exactly 12 digits
+    if (data.aadhaar.length !== 12) {
+      Validator.showError(formEl.querySelector('[name="mem_aadhaar"]'),
+        'Aadhaar number must be exactly 12 digits.');
+      return false;
+    }
+
+    // Fee validation for General Member
+    if (membershipType === 'general') {
+      if (data.fee < 10) {
+        Validator.showError(formEl.querySelector('[name="mem_fee"]'),
+          'Minimum annual fee is ₹10.');
+        return false;
+      }
+    }
+
+    // Email format check (only if provided)
+    if (data.email && !Validator.isValidEmail(data.email)) {
+      Validator.showError(formEl.querySelector('[name="mem_email"]'),
+        'Please enter a valid email address.');
+      return false;
+    }
+
+    // Terms checks
+    if (!data.agreeConst) {
+      Toast.show('You must agree to the Party Constitution (Clause 2).', 'error');
+      return false;
+    }
+    if (!data.agreeTC) {
+      Toast.show('You must agree to the Membership Terms & Conditions (Clause 3).', 'error');
+      return false;
+    }
+
+    // Generate ID & tenure
     const memberId   = IDGenerator.forType(membershipType);
+    const tenure     = TenureCalc.formatTenure();
     const issuedDate = formatDate();
 
-    // --- Save to UserStore (if logged in, update existing; else create new) ---
+    // Build record
+    const record = {
+      id             : 'MEM_' + Date.now(),
+      name           : data.name,
+      email          : data.email,
+      phone          : data.phone,
+      dob            : data.dob,
+      gender         : data.gender,
+      aadhaar        : data.aadhaar,
+      village        : data.village,
+      block          : data.block,
+      subDistrict    : data.subDistrict,
+      district       : data.district,
+      fullAddress    : data.fullAddress,
+      state          : data.state,
+      fee            : data.fee,
+      membershipType,
+      memberId,
+      status         : 'active',
+      issuedDate,
+      tenureStart    : tenure.start,
+      tenureEnd      : tenure.end,
+      joinedDate     : issuedDate,
+      joinedTimestamp: Date.now(),
+      referredMembers: [],   // IDs of members referred by this member
+    };
+
+    // Save
     const session = getSession();
     if (session && session.id) {
       UserStore.update(session.id, {
         membershipType,
         memberId,
-        status    : 'active',
-        phone     : data.phone     || session.phone,
-        state     : data.state     || session.state,
-        district  : data.district  || session.district,
-        aadhaar   : data.aadhaar,
-        dob       : data.dob,
-        gender    : data.gender,
-        address   : data.address,
+        status         : 'active',
+        phone          : data.phone  || session.phone,
+        state          : data.state  || session.state,
+        district       : data.district,
+        village        : data.village,
+        block          : data.block,
+        subDistrict    : data.subDistrict,
+        fullAddress    : data.fullAddress,
+        aadhaar        : data.aadhaar,
+        dob            : data.dob,
+        gender         : data.gender,
+        fee            : data.fee,
         issuedDate,
+        tenureStart    : tenure.start,
+        tenureEnd      : tenure.end,
+        referredMembers: [],
       });
       refreshSessionAfterMembership(session.id);
     } else {
-      // Stand-alone membership (not logged in — store separately)
-      const record = {
-        id             : 'MEM_' + Date.now(),
-        name           : data.name,
-        email          : data.email,
-        phone          : data.phone,
-        dob            : data.dob,
-        gender         : data.gender,
-        aadhaar        : data.aadhaar,
-        state          : data.state,
-        district       : data.district,
-        address        : data.address,
-        membershipType,
-        memberId,
-        issuedDate,
-        status         : 'active',
-        joinedDate     : issuedDate,
-        joinedTimestamp: Date.now(),
-      };
-      // Store in a separate list
       const existing = SecureStore.get('standalone_members') || [];
       existing.push(record);
       SecureStore.set('standalone_members', existing);
     }
 
     return {
-      success   : true,
+      success  : true,
       memberId,
       issuedDate,
-      data      : { ...data, membershipType },
+      tenureEnd: tenure.end,
+      data     : { ...data, membershipType },
     };
   }
 
@@ -298,71 +407,68 @@ const VolunteerForm = (() => {
 
   async function submit(formEl) {
 
-    // --- Security checks ---
     if (!Honeypot.check(formEl)) {
-      Toast.show('Submission blocked. Please try again.', 'error');
-      return false;
-    }
-    if (!SubmitTimeGuard.check(formEl)) {
-      Toast.show('Please take a moment to fill out the form carefully.', 'error');
-      return false;
+      Toast.show('Submission blocked.', 'error'); return false;
     }
     if (!RateLimiter.check('volunteer', 3, 120000)) {
-      Toast.show('Too many attempts. Please wait 2 minutes.', 'error');
-      return false;
+      Toast.show('Too many attempts. Please wait.', 'error'); return false;
     }
 
-    // --- Get raw values ---
     const raw = {
       name        : formEl.querySelector('[name="vol_name"]')?.value        || '',
+      dob         : formEl.querySelector('[name="vol_dob"]')?.value         || '',
       email       : formEl.querySelector('[name="vol_email"]')?.value       || '',
       phone       : formEl.querySelector('[name="vol_phone"]')?.value       || '',
-      dob         : formEl.querySelector('[name="vol_dob"]')?.value         || '',
       gender      : formEl.querySelector('[name="vol_gender"]')?.value      || '',
-      state       : formEl.querySelector('[name="vol_state"]')?.value       || '',
+      village     : formEl.querySelector('[name="vol_village"]')?.value     || '',
+      block       : formEl.querySelector('[name="vol_block"]')?.value       || '',
+      subDistrict : formEl.querySelector('[name="vol_sub_district"]')?.value|| '',
       district    : formEl.querySelector('[name="vol_district"]')?.value    || '',
-      address     : formEl.querySelector('[name="vol_address"]')?.value     || '',
+      fullAddress : formEl.querySelector('[name="vol_full_address"]')?.value|| '',
+      state       : formEl.querySelector('[name="vol_state"]')?.value       || '',
       occupation  : formEl.querySelector('[name="vol_occupation"]')?.value  || '',
       skills      : formEl.querySelector('[name="vol_skills"]')?.value      || '',
       availability: formEl.querySelector('[name="vol_availability"]')?.value|| '',
-      agree       : formEl.querySelector('[name="vol_agree"]')?.checked     || false,
+      agreeConst  : formEl.querySelector('[name="vol_agree_constitution"]')?.checked || false,
+      agreeTC     : formEl.querySelector('[name="vol_agree_tc"]')?.checked  || false,
     };
 
-    // --- Sanitize ---
     const data = {
       name        : Sanitizer.name(raw.name),
-      email       : Sanitizer.email(raw.email),
+      dob         : Sanitizer.clean(raw.dob,         { maxLength: 20  }),
+      email       : raw.email ? Sanitizer.email(raw.email) : '',
       phone       : Sanitizer.phone(raw.phone),
-      dob         : Sanitizer.clean(raw.dob,          { maxLength: 20  }),
-      gender      : Sanitizer.clean(raw.gender,       { maxLength: 20  }),
-      state       : Sanitizer.clean(raw.state,        { maxLength: 60  }),
-      district    : Sanitizer.clean(raw.district,     { maxLength: 60  }),
-      address     : Sanitizer.clean(raw.address,      { maxLength: 300 }),
-      occupation  : Sanitizer.clean(raw.occupation,   { maxLength: 100 }),
-      skills      : Sanitizer.clean(raw.skills,       { maxLength: 500 }),
-      availability: Sanitizer.clean(raw.availability, { maxLength: 60  }),
-      agree       : raw.agree,
+      gender      : Sanitizer.clean(raw.gender,      { maxLength: 20  }),
+      village     : Sanitizer.clean(raw.village,     { maxLength: 100 }),
+      block       : Sanitizer.clean(raw.block,       { maxLength: 100 }),
+      subDistrict : Sanitizer.clean(raw.subDistrict, { maxLength: 100 }),
+      district    : Sanitizer.clean(raw.district,    { maxLength: 100 }),
+      fullAddress : Sanitizer.clean(raw.fullAddress, { maxLength: 400 }),
+      state       : Sanitizer.clean(raw.state,       { maxLength: 60  }),
+      occupation  : Sanitizer.clean(raw.occupation,  { maxLength: 100 }),
+      skills      : Sanitizer.clean(raw.skills,      { maxLength: 500 }),
+      availability: Sanitizer.clean(raw.availability,{ maxLength: 60  }),
+      agreeConst  : raw.agreeConst,
+      agreeTC     : raw.agreeTC,
     };
 
-    // --- Validate ---
     const rules = [
-      { field: 'vol_name',         required: true, minLength: 3, requiredMsg: 'Full name is required.' },
-      { field: 'vol_email',        required: true, type: 'email', requiredMsg: 'Email is required.' },
+      { field: 'vol_name',         required: true, minLength: 3,  requiredMsg: 'Full name is required.' },
+      { field: 'vol_dob',          required: true,                requiredMsg: 'Date of birth is required.' },
       { field: 'vol_phone',        required: true, type: 'phone', requiredMsg: 'Mobile number is required.' },
-      { field: 'vol_dob',          required: true, requiredMsg: 'Date of birth is required.' },
-      { field: 'vol_gender',       required: true, requiredMsg: 'Please select gender.' },
-      { field: 'vol_state',        required: true, requiredMsg: 'Please select your state.' },
-      { field: 'vol_availability', required: true, requiredMsg: 'Please select availability.' },
+      { field: 'vol_gender',       required: true,                requiredMsg: 'Please select gender.' },
+      { field: 'vol_village',      required: true,                requiredMsg: 'Village / City is required.' },
+      { field: 'vol_block',        required: true,                requiredMsg: 'Block is required.' },
+      { field: 'vol_sub_district', required: true,                requiredMsg: 'Sub District is required.' },
+      { field: 'vol_district',     required: true,                requiredMsg: 'District is required.' },
+      { field: 'vol_full_address', required: true, minLength: 10, requiredMsg: 'Full address is required.' },
+      { field: 'vol_state',        required: true,                requiredMsg: 'Please select your state.' },
+      { field: 'vol_availability', required: true,                requiredMsg: 'Please select availability.' },
     ];
 
     if (!Validator.validate(formEl, rules)) return false;
 
-    if (!data.agree) {
-      Toast.show('Please agree to the Terms & Conditions.', 'error');
-      return false;
-    }
-
-    // --- Age check (18+) ---
+    // Age 18+
     if (data.dob) {
       const dob   = new Date(data.dob);
       const today = new Date();
@@ -370,16 +476,28 @@ const VolunteerForm = (() => {
       const m     = today.getMonth() - dob.getMonth();
       if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
       if (age < 18) {
-        Validator.showError(formEl.querySelector('[name="vol_dob"]'), 'You must be at least 18 years old.');
+        Validator.showError(formEl.querySelector('[name="vol_dob"]'),
+          'You must be at least 18 years old.');
         return false;
       }
     }
 
-    // --- Generate Volunteer ID ---
-    const volunteerId = IDGenerator.forType('volunteer');
+    if (data.email && !Validator.isValidEmail(data.email)) {
+      Validator.showError(formEl.querySelector('[name="vol_email"]'),
+        'Please enter a valid email address.');
+      return false;
+    }
+
+    if (!data.agreeConst) {
+      Toast.show('You must agree to the Party Constitution (Clause 2).', 'error'); return false;
+    }
+    if (!data.agreeTC) {
+      Toast.show('You must agree to the Terms & Conditions (Clause 3).', 'error'); return false;
+    }
+
+    const volunteerId = IDGenerator.generate('VOL');
     const issuedDate  = formatDate();
 
-    // --- Save ---
     const session = getSession();
     if (session && session.id) {
       UserStore.update(session.id, {
@@ -389,7 +507,11 @@ const VolunteerForm = (() => {
         status         : 'active',
         phone          : data.phone    || session.phone,
         state          : data.state    || session.state,
-        district       : data.district || session.district,
+        district       : data.district,
+        village        : data.village,
+        block          : data.block,
+        subDistrict    : data.subDistrict,
+        fullAddress    : data.fullAddress,
         occupation     : data.occupation,
         skills         : data.skills,
         availability   : data.availability,
@@ -398,27 +520,18 @@ const VolunteerForm = (() => {
       refreshSessionAfterMembership(session.id);
     } else {
       const record = {
-        id             : 'VOL_' + Date.now(),
-        ...data,
+        id: 'VOL_' + Date.now(), ...data,
         membershipType : 'volunteer',
-        volunteerId,
-        memberId       : volunteerId,
-        issuedDate,
-        status         : 'active',
-        joinedDate     : issuedDate,
-        joinedTimestamp: Date.now(),
+        volunteerId, memberId: volunteerId,
+        issuedDate, status: 'active',
+        joinedDate: issuedDate, joinedTimestamp: Date.now(),
       };
       const existing = SecureStore.get('standalone_volunteers') || [];
       existing.push(record);
       SecureStore.set('standalone_volunteers', existing);
     }
 
-    return {
-      success     : true,
-      volunteerId,
-      issuedDate,
-      data        : { ...data, membershipType: 'volunteer' },
-    };
+    return { success: true, volunteerId, memberId: volunteerId, issuedDate, data: { ...data, membershipType: 'volunteer' } };
   }
 
   return { submit };
@@ -427,67 +540,195 @@ const VolunteerForm = (() => {
 window.VolunteerForm = VolunteerForm;
 
 /* ================================================================
-   SHOW SUCCESS STATE WITH ID CARD
+   ACTIVE MEMBERSHIP UPGRADE
+   Member enters 25 referred General Member IDs to get upgraded
+   ================================================================ */
+const ActiveUpgrade = (() => {
+
+  const REQUIRED = 25;
+
+  // Add a referred member ID to current user's list
+  function addReferral(currentUserId, referredMemberId) {
+
+    // Clean input
+    const id = referredMemberId.trim().toUpperCase();
+
+    if (!id) return { success: false, message: 'Please enter a Member ID.' };
+
+    // Check if ID exists in the system
+    if (!IDGenerator.exists(id)) {
+      return { success: false, message: `Member ID "${id}" not found in the system.` };
+    }
+
+    // Get current user
+    const user = UserStore.findById(currentUserId);
+    if (!user) return { success: false, message: 'User not found.' };
+
+    // Can't add own ID
+    if (user.memberId === id) {
+      return { success: false, message: 'You cannot add your own Member ID.' };
+    }
+
+    const referred = user.referredMembers || [];
+
+    // Already added
+    if (referred.includes(id)) {
+      return { success: false, message: `Member ID "${id}" already added.` };
+    }
+
+    // Add it
+    referred.push(id);
+    UserStore.update(currentUserId, { referredMembers: referred });
+
+    const count     = referred.length;
+    const remaining = REQUIRED - count;
+
+    // Check if threshold reached → auto-upgrade
+    if (count >= REQUIRED) {
+      upgradeToActive(currentUserId);
+      return {
+        success  : true,
+        upgraded : true,
+        count,
+        message  : `🎉 Congratulations! You have added ${count} members and are now upgraded to Active Member!`
+      };
+    }
+
+    return {
+      success  : true,
+      upgraded : false,
+      count,
+      remaining,
+      message  : `✅ Member added! You have added ${count}/${REQUIRED} members. ${remaining} more to go!`
+    };
+  }
+
+  // Upgrade user to Active Member
+  function upgradeToActive(userId) {
+    const newId      = IDGenerator.generate('AM');
+    const issuedDate = formatDate();
+    const tenure     = TenureCalc.formatTenure();
+
+    UserStore.update(userId, {
+      membershipType : 'active',
+      memberId       : newId,
+      previousGMId   : UserStore.findById(userId)?.memberId,
+      status         : 'active',
+      upgradedDate   : issuedDate,
+      tenureStart    : tenure.start,
+      tenureEnd      : tenure.end,
+    });
+
+    refreshSessionAfterMembership(userId);
+    return newId;
+  }
+
+  // Get progress for a user
+  function getProgress(userId) {
+    const user    = UserStore.findById(userId);
+    if (!user) return { count: 0, remaining: REQUIRED, referred: [] };
+    const referred  = user.referredMembers || [];
+    const count     = referred.length;
+    return {
+      count,
+      remaining : Math.max(0, REQUIRED - count),
+      referred,
+      percent   : Math.min(100, Math.round((count / REQUIRED) * 100)),
+      required  : REQUIRED,
+    };
+  }
+
+  return { addReferral, upgradeToActive, getProgress, REQUIRED };
+})();
+
+window.ActiveUpgrade = ActiveUpgrade;
+
+/* ================================================================
+   SHOW SUCCESS POPUP (Modal)
    Called after successful form submission
    ================================================================ */
-function showMembershipSuccess(containerEl, result, isVolunteer = false) {
-  const { memberId, volunteerId, issuedDate, data } = result;
+function showMembershipSuccessPopup(result, isVolunteer = false) {
+  const { memberId, volunteerId, issuedDate, tenureEnd, data } = result;
   const finalId    = memberId || volunteerId;
   const memberType = isVolunteer ? 'volunteer' : data.membershipType;
+  const tenure     = TenureCalc.formatTenure();
 
+  // Build ID card HTML
   const cardHTML = IDCardRenderer.render({
     name           : data.name,
     memberId       : finalId,
     membershipType : memberType,
     state          : data.state,
     district       : data.district,
-    phone          : data.phone,
     issuedDate,
+    tenureEnd      : tenureEnd || tenure.end,
+    fee            : data.fee || null,
   });
 
-  containerEl.innerHTML = `
-    <div class="success-box">
-      <div class="success-icon">🎉</div>
-      <div class="success-title">
+  // Build popup content
+  const popupHTML = `
+    <div style="text-align:center; padding: 4px 0 16px;">
+      <div style="width:64px;height:64px;background:linear-gradient(135deg,#4CAF50,#2E7D32);
+           border-radius:50%;display:flex;align-items:center;justify-content:center;
+           font-size:1.9rem;margin:0 auto 14px;box-shadow:0 8px 24px rgba(76,175,80,0.3);">🎉</div>
+      <div style="font-size:1.2rem;font-weight:800;color:var(--text-dark);margin-bottom:6px;">
         ${isVolunteer ? 'Welcome, Volunteer!' : 'Membership Successful!'}
       </div>
-      <div class="success-desc">
-        ${isVolunteer
-          ? `Thank you for joining as a <strong>Volunteer</strong>. Your unique ID is below.`
-          : `You are now a <strong>${data.membershipType === 'general' ? 'General' : 'Active'} Member</strong> of Jan Kalyan Party!`
-        }
+      <div style="font-size:0.86rem;color:var(--gray-600);margin-bottom:4px;">
+        Your <strong>${isVolunteer ? 'Volunteer' : (memberType === 'general' ? 'General' : 'Active') + ' Member'}</strong>
+        registration is complete.
+      </div>
+      <div style="font-size:0.80rem;color:var(--gray-600);margin-bottom:20px;">
+        Membership valid: <strong>${tenure.display}</strong>
       </div>
     </div>
 
     ${cardHTML}
 
-    <div style="display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; justify-content:center;">
+    <!-- Login alert -->
+    <div style="background:var(--blue-pale);border-left:4px solid var(--blue);
+         border-radius:0 8px 8px 0;padding:14px 16px;margin-top:18px;
+         font-size:0.82rem;color:var(--blue-dark);line-height:1.65;">
+      <strong>ℹ️ Important:</strong> Please
+      <a href="member-area.html" style="color:var(--orange);font-weight:700;">login to your Member Area</a>
+      to view, download and print your official ID card at any time.
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;justify-content:center;">
       <button class="btn btn-blue btn-sm" onclick="printIDCard('rendered-id-card')">
         🖨️ Print ID Card
       </button>
-      <button class="btn btn-outline-orange btn-sm" onclick="copyToClipboard('${finalId}', 'Member ID copied!')">
+      <button class="btn btn-outline-orange btn-sm"
+              onclick="copyToClipboard('${finalId}', 'Member ID copied!')">
         📋 Copy Member ID
       </button>
       <a href="member-area.html" class="btn btn-orange btn-sm">
-        👤 Go to Member Area
+        👤 Login / Member Area
       </a>
     </div>
 
-    <p style="font-size:0.76rem; color:var(--gray-600); text-align:center; margin-top:14px;">
-      📧 A confirmation will be sent to <strong>${sanitizeHTML(data.email)}</strong> once our team processes your application.
+    <p style="font-size:0.73rem;color:var(--gray-400);text-align:center;margin-top:14px;">
+      Your Member ID: <strong style="color:var(--orange);letter-spacing:1px;">${sanitizeHTML(finalId)}</strong>
+      — Save this for your records.
     </p>
   `;
+
+  // Inject into modal
+  const modalBody = document.getElementById('success-modal-body');
+  if (modalBody) {
+    modalBody.innerHTML = popupHTML;
+    Modal.open('success-modal');
+  }
 }
 
-window.showMembershipSuccess = showMembershipSuccess;
+window.showMembershipSuccessPopup = showMembershipSuccessPopup;
 
 /* ================================================================
    MEMBERSHIP PAGE CONTROLLER
-   Controls modal flows and form submissions on membership.html
    ================================================================ */
 function initMembershipPage() {
 
-  // ---- General Member Form ----
+  // General Member Form
   const generalForm = document.getElementById('general-member-form');
   if (generalForm) {
     Validator.attachLiveClear(generalForm);
@@ -496,34 +737,18 @@ function initMembershipPage() {
 
     generalForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn    = generalForm.querySelector('[type="submit"]');
-      const result = await handleMemberFormSubmit(generalForm, 'general', btn);
-      if (result) {
-        const container = document.getElementById('general-form-container');
-        if (container) showMembershipSuccess(container, result);
+      const btn = generalForm.querySelector('[type="submit"]');
+      SubmitGuard.lockButton(btn, 'Submitting...');
+      const result = await MembershipForm.submit(generalForm, 'general');
+      if (result && result.success) {
+        showMembershipSuccessPopup(result, false);
+        generalForm.reset();
       }
+      SubmitGuard.unlockButton(btn);
     });
   }
 
-  // ---- Active Member Form ----
-  const activeForm = document.getElementById('active-member-form');
-  if (activeForm) {
-    Validator.attachLiveClear(activeForm);
-    Honeypot.inject(activeForm);
-    SubmitTimeGuard.stamp(activeForm);
-
-    activeForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn    = activeForm.querySelector('[type="submit"]');
-      const result = await handleMemberFormSubmit(activeForm, 'active', btn);
-      if (result) {
-        const container = document.getElementById('active-form-container');
-        if (container) showMembershipSuccess(container, result);
-      }
-    });
-  }
-
-  // ---- Volunteer Form ----
+  // Volunteer Form
   const volunteerForm = document.getElementById('volunteer-form');
   if (volunteerForm) {
     Validator.attachLiveClear(volunteerForm);
@@ -532,31 +757,15 @@ function initMembershipPage() {
 
     volunteerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn    = volunteerForm.querySelector('[type="submit"]');
+      const btn = volunteerForm.querySelector('[type="submit"]');
       SubmitGuard.lockButton(btn, 'Submitting...');
-
       const result = await VolunteerForm.submit(volunteerForm);
-
       if (result && result.success) {
-        const container = document.getElementById('volunteer-form-container');
-        if (container) showMembershipSuccess(container, result, true);
-        Toast.show('Volunteer registration successful!', 'success');
-      } else {
-        SubmitGuard.unlockButton(btn);
+        showMembershipSuccessPopup(result, true);
+        volunteerForm.reset();
       }
+      SubmitGuard.unlockButton(btn);
     });
-  }
-}
-
-async function handleMemberFormSubmit(formEl, membershipType, btn) {
-  SubmitGuard.lockButton(btn, 'Submitting...');
-  const result = await MembershipForm.submit(formEl, membershipType);
-  if (result && result.success) {
-    Toast.show(`${membershipType === 'general' ? 'General' : 'Active'} Membership registered!`, 'success');
-    return result;
-  } else {
-    SubmitGuard.unlockButton(btn);
-    return null;
   }
 }
 
