@@ -392,62 +392,152 @@
   <div class="container">
 
     <!-- ========================
-         AUTH CARD (Login Only)
+         AUTH CARD (Login / Register)
          ======================== -->
     <div id="auth-card">
       <div class="auth-card">
 
         <!-- Header -->
         <div class="auth-head">
+          <img src="assets/logo.png" alt="Jan Kalyan Party Logo">
           <h2>Jan Kalyan Party</h2>
-          <p>Members Area</p>
+          <p>Member Portal — जन कल्याण पार्टी</p>
         </div>
 
-        <!-- Tabs — Login only, no separate register -->
+        <!-- Tabs -->
         <div class="auth-body">
-          <div style="background:var(--blue-pale);border-radius:var(--radius-sm);padding:12px 16px;
-               margin-bottom:22px;font-size:0.82rem;color:var(--blue-dark);line-height:1.65;">
-            <strong>ℹ️ How to Login:</strong> Use the <strong>mobile number or email</strong>
-            you registered with, your <strong>12-digit Aadhaar</strong>, and your
-            <strong>Membership ID</strong> (e.g. JKP-GM-2025-XXXXXX) shown on your ID card.
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tab-login">🔑 Login</button>
+            <button class="auth-tab" id="tab-register">📝 Register</button>
           </div>
 
           <!-- ===== LOGIN FORM ===== -->
-          <form id="login-form-el" data-protected novalidate autocomplete="off">
+          <div class="auth-form active" id="login-form">
+            <form id="login-form-el" data-protected novalidate autocomplete="off">
 
-            <div class="form-group">
-              <label class="form-label">Mobile Number or Email <span class="req">*</span></label>
-              <input type="text" name="login_identifier" class="form-control"
-                     placeholder="Registered mobile or email address" maxlength="254">
-              <div class="form-error"></div>
-            </div>
+              <div class="form-group">
+                <label class="form-label">Email or Mobile Number <span class="req">*</span></label>
+                <input type="text" name="login_identifier" class="form-control"
+                       placeholder="Email address or 10-digit mobile" maxlength="254">
+                <div class="form-error"></div>
+              </div>
 
-            <div class="form-group">
-              <label class="form-label">Aadhaar Number <span class="req">*</span> <span style="font-weight:400;font-size:0.72rem;color:var(--gray-400);">(12 digits)</span></label>
-              <input type="text" name="login_aadhaar" class="form-control"
-                     placeholder="Enter your 12-digit Aadhaar number"
-                     maxlength="12" inputmode="numeric">
-              <div class="form-error"></div>
-            </div>
+              <div class="form-group">
+                <label class="form-label">Password <span class="req">*</span></label>
+                <div class="pwd-input-wrap">
+                  <input type="password" name="login_password" id="login_password"
+                         class="form-control" placeholder="Enter your password" maxlength="128">
+                  <button type="button" class="pwd-toggle" data-target="login_password">👁</button>
+                </div>
+                <div class="form-error"></div>
+              </div>
 
-            <div class="form-group">
-              <label class="form-label">Membership ID / Volunteer ID <span class="req">*</span></label>
-              <input type="text" name="login_member_id" class="form-control"
-                     placeholder="e.g. JKP-GM-2025-123456"
-                     maxlength="25" style="text-transform:uppercase;letter-spacing:1px;font-weight:600;">
-              <div class="form-error"></div>
-            </div>
+              <div style="text-align:right;margin-top:-8px;margin-bottom:14px;">
+                <a href="#" style="font-size:0.78rem;color:var(--orange);">Forgot Password?</a>
+              </div>
 
-            <button type="submit" class="btn btn-orange btn-full" style="margin-top:6px;">
-              🔑 Login to Member Area
-            </button>
+              <button type="submit" class="btn btn-orange btn-full">
+                🔑 Login to Member Area
+              </button>
 
-            <div style="text-align:center;margin-top:16px;font-size:0.80rem;color:var(--gray-600);">
-              Not a member yet?
-              <a href="membership.html" style="color:var(--orange);font-weight:700;">Register here →</a>
-            </div>
+              <div class="auth-divider">or</div>
 
-          </form>
+              <div class="auth-link">
+                Don't have an account?
+                <a href="#" id="go-to-register">Register here</a>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- ===== REGISTER FORM ===== -->
+          <div class="auth-form" id="register-form">
+            <form id="register-form-el" data-protected novalidate autocomplete="off">
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Full Name <span class="req">*</span></label>
+                  <input type="text" name="reg_name" class="form-control"
+                         placeholder="Your full name" maxlength="100">
+                  <div class="form-error"></div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mobile Number <span class="req">*</span></label>
+                  <input type="tel" name="reg_phone" class="form-control"
+                         placeholder="10-digit mobile" maxlength="10">
+                  <div class="form-error"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" name="reg_email" class="form-control"
+                       placeholder="yourname@email.com" maxlength="254">
+                <div class="form-error"></div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">State <span class="req">*</span></label>
+                  <select name="reg_state" class="form-control">
+                    <option value="">Select State</option>
+                  </select>
+                  <div class="form-error"></div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">District</label>
+                  <input type="text" name="reg_district" class="form-control"
+                         placeholder="Your district" maxlength="60">
+                  <div class="form-error"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Create Password <span class="req">*</span></label>
+                <div class="pwd-input-wrap">
+                  <input type="password" name="reg_password" id="reg_password"
+                         class="form-control" placeholder="Min. 8 characters" maxlength="128">
+                  <button type="button" class="pwd-toggle" data-target="reg_password">👁</button>
+                </div>
+                <div class="strength-bar-wrap">
+                  <div id="pwd-strength-bar"></div>
+                </div>
+                <span id="pwd-strength-label"></span>
+                <div class="form-error"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Confirm Password <span class="req">*</span></label>
+                <div class="pwd-input-wrap">
+                  <input type="password" name="reg_confirm_password" id="reg_confirm_password"
+                         class="form-control" placeholder="Re-enter password" maxlength="128">
+                  <button type="button" class="pwd-toggle" data-target="reg_confirm_password">👁</button>
+                </div>
+                <div class="form-error"></div>
+              </div>
+
+              <div class="form-check">
+                <input type="checkbox" name="reg_agree" id="reg-agree">
+                <label class="form-check-label" for="reg-agree">
+                  I agree to the <a href="#" target="_blank">Terms & Conditions</a>
+                  and <a href="#" target="_blank">Privacy Policy</a> of Jan Kalyan Party.
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-orange btn-full" style="margin-top:18px;">
+                📝 Create Account
+              </button>
+
+              <div class="auth-divider">or</div>
+
+              <div class="auth-link">
+                Already have an account?
+                <a href="#" id="go-to-login">Login here</a>
+              </div>
+
+            </form>
+          </div>
+
         </div><!-- /auth-body -->
       </div><!-- /auth-card -->
 
@@ -475,7 +565,7 @@
           </div>
         </div>
         <div class="dash-header-right">
-          <a href="membership.html" class="btn btn-outline-white btn-sm">🪪 Get Membership</a>
+          <a href="membership.html" class="btn btn-outline-white btn-sm">🪪 Upgrade Membership</a>
           <button id="logout-btn" class="btn btn-sm"
                   style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.4);">
             🚪 Logout
@@ -576,8 +666,8 @@
 
         <!-- RIGHT: Activity + Join Prompt -->
         <div>
-          <!-- Join Membership Prompt (shown if no membership yet) -->
-          <div id="dash-join-prompt" class="dash-card" style="margin-bottom:20px;display:none;">
+          <!-- Join Membership Prompt (shown if no membership) -->
+          <div id="dash-join-prompt" class="dash-card" style="margin-bottom:20px;">
             <div class="join-prompt">
               <div class="join-prompt-icon">🪪</div>
               <div class="join-prompt-title">Get Your Official Membership</div>
@@ -587,62 +677,9 @@
               </div>
               <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
                 <a href="membership.html#general"   class="btn btn-blue btn-sm">🔵 General Member</a>
+                <a href="membership.html#active"    class="btn btn-orange btn-sm">🟠 Active Member</a>
                 <a href="membership.html#volunteer" class="btn btn-green btn-sm">🟢 Volunteer</a>
               </div>
-            </div>
-          </div>
-
-          <!-- Active Member Upgrade Panel (shown for General Members only) -->
-          <div id="upgrade-panel" class="dash-card" style="margin-bottom:20px;display:none;">
-            <div class="dash-card-title">
-              <div class="dash-title-icon">🟠</div>
-              Upgrade to Active Member
-            </div>
-
-            <!-- Progress Bar -->
-            <div style="margin-bottom:16px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <span style="font-size:0.82rem;font-weight:600;color:var(--text-dark);">Referral Progress</span>
-                <span style="font-size:0.82rem;font-weight:800;color:var(--orange);">
-                  <span id="referral-count">0</span> / 25 members
-                </span>
-              </div>
-              <div style="height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;">
-                <div id="referral-progress-bar"
-                     style="height:100%;width:0%;background:linear-gradient(90deg,var(--orange),var(--orange-light));
-                            border-radius:4px;transition:width 0.5s ease;"></div>
-              </div>
-              <div style="font-size:0.75rem;color:var(--gray-600);margin-top:5px;" id="referral-status-text">
-                Add 25 General Member IDs to unlock Active Membership.
-              </div>
-            </div>
-
-            <!-- Add referral input -->
-            <div id="referral-input-wrap">
-              <div style="font-size:0.83rem;font-weight:600;color:var(--text-dark);margin-bottom:8px;">
-                Enter a Member ID you referred:
-              </div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <input type="text" id="referral-id-input" class="form-control"
-                       placeholder="e.g. JKP-GM-2025-123456"
-                       style="flex:1;min-width:180px;text-transform:uppercase;font-weight:600;letter-spacing:1px;"
-                       maxlength="25">
-                <button class="btn btn-orange btn-sm" id="add-referral-btn" style="white-space:nowrap;">
-                  ➕ Add Member
-                </button>
-              </div>
-              <div style="font-size:0.74rem;color:var(--gray-600);margin-top:6px;">
-                Ask each person you helped join to share their Member ID with you.
-              </div>
-            </div>
-
-            <!-- Added IDs list -->
-            <div id="referred-members-list" style="margin-top:14px;display:none;">
-              <div style="font-size:0.80rem;font-weight:700;color:var(--text-dark);margin-bottom:8px;">
-                Members Added:
-              </div>
-              <div id="referred-ids-wrap"
-                   style="display:flex;flex-wrap:wrap;gap:6px;max-height:110px;overflow-y:auto;"></div>
             </div>
           </div>
 
@@ -774,118 +811,17 @@
 /* ---- Wire login & register forms to auth.js ---- */
 document.addEventListener('DOMContentLoaded', () => {
 
-/* ---- Show/hide correct panels based on membership type ---- */
-function updateDashboardPanels(session) {
-  const joinPrompt    = document.getElementById('dash-join-prompt');
-  const upgradePanel  = document.getElementById('upgrade-panel');
-
-  if (!session) return;
-
-  const hasMembership = session.memberId || session.volunteerId;
-  const isGeneral     = session.membershipType === 'general';
-
-  // Show join prompt if no membership
-  if (joinPrompt)   joinPrompt.style.display   = hasMembership ? 'none' : 'block';
-  // Show upgrade panel only for General Members
-  if (upgradePanel) upgradePanel.style.display = isGeneral ? 'block' : 'none';
-
-  // Populate upgrade panel if General Member
-  if (isGeneral && session.id) {
-    populateUpgradePanel(session.id);
-  }
-}
-
-/* ---- Populate upgrade panel with progress ---- */
-function populateUpgradePanel(userId) {
-  if (typeof ActiveUpgrade === 'undefined') return;
-
-  const progress      = ActiveUpgrade.getProgress(userId);
-  const countEl       = document.getElementById('referral-count');
-  const barEl         = document.getElementById('referral-progress-bar');
-  const statusEl      = document.getElementById('referral-status-text');
-  const listWrap      = document.getElementById('referred-members-list');
-  const idsWrap       = document.getElementById('referred-ids-wrap');
-  const inputWrap     = document.getElementById('referral-input-wrap');
-
-  if (countEl)  countEl.textContent  = progress.count;
-  if (barEl)    barEl.style.width    = progress.percent + '%';
-
-  if (statusEl) {
-    statusEl.textContent = progress.count >= ActiveUpgrade.REQUIRED
-      ? '🎉 You have reached 25 referrals and been upgraded to Active Member!'
-      : `Add ${progress.remaining} more member${progress.remaining !== 1 ? 's' : ''} to unlock Active Membership.`;
-  }
-
-  // Hide input if already upgraded
-  if (inputWrap) inputWrap.style.display = progress.count >= ActiveUpgrade.REQUIRED ? 'none' : 'block';
-
-  // Show referred IDs
-  if (idsWrap && progress.referred.length > 0) {
-    if (listWrap) listWrap.style.display = 'block';
-    idsWrap.innerHTML = progress.referred.map(id => `
-      <span style="background:var(--orange-pale);color:var(--orange);font-size:0.72rem;
-                   font-weight:700;padding:3px 10px;border-radius:50px;letter-spacing:0.5px;">
-        ${sanitizeHTML(id)}
-      </span>`).join('');
-  }
-}
-
-/* ---- Wire up Add Referral button ---- */
-function initUpgradePanel(session) {
-  const addBtn   = document.getElementById('add-referral-btn');
-  const input    = document.getElementById('referral-id-input');
-
-  if (!addBtn || !input || !session?.id) return;
-
-  addBtn.addEventListener('click', () => {
-    const id = input.value.trim().toUpperCase();
-    if (!id) { Toast.show('Please enter a Member ID.', 'error'); return; }
-
-    const result = ActiveUpgrade.addReferral(session.id, id);
-
-    if (result.success) {
-      Toast.show(result.message, result.upgraded ? 'success' : 'info', 4000);
-      input.value = '';
-      populateUpgradePanel(session.id);
-
-      // If upgraded → refresh dashboard
-      if (result.upgraded) {
-        setTimeout(() => {
-          populateDashboard();
-          populateActivityFeed(getSession());
-          updateDashboardPanels(getSession());
-        }, 1000);
-      }
-    } else {
-      Toast.show(result.message, 'error');
-    }
-  });
-
-  // Allow Enter key
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); }
-  });
-
-  // Auto uppercase input
-  input.addEventListener('input', () => {
-    input.value = input.value.toUpperCase();
-  });
-}
-
   const authCardWrap  = document.getElementById('auth-card');
   const dashWrap      = document.getElementById('dashboard-wrap');
   const loginFormEl   = document.getElementById('login-form-el');
+  const registerFormEl= document.getElementById('register-form-el');
+  const tabLogin      = document.getElementById('tab-login');
+  const tabRegister   = document.getElementById('tab-register');
+  const loginPane     = document.getElementById('login-form');
+  const registerPane  = document.getElementById('register-form');
   const logoutBtn     = document.getElementById('logout-btn');
-
-  // Aadhaar: digits only
-  document.querySelector('[name="login_aadhaar"]')?.addEventListener('input', function() {
-    this.value = this.value.replace(/\D/g, '').substring(0, 12);
-  });
-
-  // Member ID: auto uppercase
-  document.querySelector('[name="login_member_id"]')?.addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
-  });
+  const goToReg       = document.getElementById('go-to-register');
+  const goToLogin     = document.getElementById('go-to-login');
 
   // Check session
   const session = getSession();
@@ -893,24 +829,62 @@ function initUpgradePanel(session) {
     showDashboard();
     populateDashboard();
     populateActivityFeed(session);
-    updateDashboardPanels(session);
-    initUpgradePanel(session);
+  }
+
+  // Tab switching
+  tabLogin?.addEventListener('click',    () => switchTab('login'));
+  tabRegister?.addEventListener('click', () => switchTab('register'));
+  goToReg?.addEventListener('click',     (e) => { e.preventDefault(); switchTab('register'); });
+  goToLogin?.addEventListener('click',   (e) => { e.preventDefault(); switchTab('login'); });
+
+  function switchTab(tab) {
+    if (tab === 'login') {
+      tabLogin.classList.add('active');
+      tabRegister.classList.remove('active');
+      loginPane.classList.add('active');
+      registerPane.classList.remove('active');
+    } else {
+      tabRegister.classList.add('active');
+      tabLogin.classList.remove('active');
+      registerPane.classList.add('active');
+      loginPane.classList.remove('active');
+    }
   }
 
   // Login submit
   if (loginFormEl) {
     Validator.attachLiveClear(loginFormEl);
-    loginFormEl.addEventListener('submit', (e) => {
+    loginFormEl.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = loginFormEl.querySelector('[type="submit"]');
-      SubmitGuard.lockButton(btn, 'Verifying...');
-      const result = Login.submit(loginFormEl);
+      SubmitGuard.lockButton(btn, 'Logging in...');
+      const result = await Login.submit(loginFormEl);
       if (result && result.success) {
         showDashboard();
         populateDashboard();
         populateActivityFeed(getSession());
-        updateDashboardPanels(getSession());
-        initUpgradePanel(getSession());
+      } else {
+        SubmitGuard.unlockButton(btn);
+      }
+    });
+  }
+
+  // Register submit
+  if (registerFormEl) {
+    Validator.attachLiveClear(registerFormEl);
+    PasswordChecker.attach('reg_password', 'pwd-strength-bar', 'pwd-strength-label');
+    Honeypot.inject(registerFormEl);
+    SubmitTimeGuard.stamp(registerFormEl);
+
+    registerFormEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = registerFormEl.querySelector('[type="submit"]');
+      SubmitGuard.lockButton(btn, 'Creating account...');
+      const result = await Registration.submit(registerFormEl);
+      if (result && result.success) {
+        showDashboard();
+        populateDashboard();
+        populateActivityFeed(getSession());
       } else {
         SubmitGuard.unlockButton(btn);
       }
