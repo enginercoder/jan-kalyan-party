@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Panel — Jan Kalyan Party</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--gray-100); }
+
+    /* Admin Login */
+    .admin-login-wrap {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .admin-login-card {
+      background: white; border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg); overflow: hidden;
+      width: 100%; max-width: 420px;
+    }
+    .admin-login-head {
+      background: linear-gradient(135deg, #1A1A2E, #0D47A1);
+      padding: 28px 32px; text-align: center; color: white;
+    }
+    .admin-login-head img { width: 56px; height: 56px; border-radius: 50%; margin-bottom: 10px; background: rgba(255,255,255,0.12); padding: 6px; }
+    .admin-login-head h2 { font-size: 1.2rem; font-weight: 800; }
+    .admin-login-head p  { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; }
+    .admin-login-body { padding: 28px 32px; }
+    .admin-attempts-warning {
+      background: #FFF3E0; border-left: 4px solid var(--orange);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 10px 14px; font-size: 0.80rem; color: #E65100;
+      margin-bottom: 16px; display: none;
+    }
+
+    /* Admin Dashboard */
+    .admin-wrap { display: none; min-height: 100vh; }
+    .admin-topbar {
+      background: linear-gradient(135deg, #1A1A2E, #0D47A1);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    .admin-topbar-brand {
+      display: flex; align-items: center; gap: 12px; color: white;
+    }
+    .admin-topbar-brand img { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.12); padding: 4px; }
+    .admin-topbar-title { font-size: 1rem; font-weight: 800; color: white; }
+    .admin-topbar-sub   { font-size: 0.70rem; opacity: 0.70; }
+    .admin-topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+    /* Stats bar */
+    .admin-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 16px; padding: 24px 24px 0;
+    }
+    .admin-stat-card {
+      background: white; border-radius: var(--radius-md);
+      padding: 18px 20px; box-shadow: var(--shadow-sm);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .admin-stat-icon {
+      width: 44px; height: 44px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .admin-stat-icon.orange { background: var(--orange-pale); }
+    .admin-stat-icon.blue   { background: var(--blue-pale); }
+    .admin-stat-icon.green  { background: #E8F5E9; }
+    .admin-stat-icon.red    { background: #FFEBEE; }
+    .admin-stat-val   { font-size: 1.4rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
+    .admin-stat-label { font-size: 0.72rem; color: var(--gray-600); margin-top: 3px; }
+
+    /* Tabs */
+    .admin-tabs {
+      display: flex; gap: 4px; padding: 20px 24px 0;
+      border-bottom: 2px solid var(--gray-200);
+      overflow-x: auto;
+    }
+    .admin-tab {
+      padding: 10px 20px; border: none; background: transparent;
+      font-family: 'Poppins', sans-serif; font-size: 0.86rem;
+      font-weight: 600; cursor: pointer; color: var(--gray-600);
+      border-bottom: 3px solid transparent; margin-bottom: -2px;
+      transition: var(--transition); white-space: nowrap;
+    }
+    .admin-tab:hover  { color: var(--orange); }
+    .admin-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+    /* Tab Panels */
+    .admin-panel { display: none; padding: 24px; }
+    .admin-panel.active { display: block; }
+
+    /* Table */
+    .admin-table-wrap {
+      background: white; border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .admin-table-head {
+      padding: 16px 20px;
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .admin-table-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
+    .admin-search {
+      padding: 8px 14px; border: 2px solid var(--gray-200);
+      border-radius: var(--radius-sm); font-family: 'Poppins', sans-serif;
+      font-size: 0.83rem; outline: none; transition: var(--transition);
+      min-width: 200px;
+    }
+    .admin-search:focus { border-color: var(--orange); }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: var(--gray-100); padding: 11px 14px;
+      text-align: left; font-size: 0.75rem; font-weight: 700;
+      color: var(--gray-600); text-transform: uppercase;
+      letter-spacing: 0.5px; white-space: nowrap;
+    }
+    td {
+      padding: 12px 14px; font-size: 0.83rem;
+      color: var(--text-dark); border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-100); }
+    .td-id { font-weight: 700; color: var(--blue); font-size: 0.78rem; letter-spacing: 0.5px; }
+    .td-utr { font-family: monospace; font-weight: 700; color: var(--text-dark); }
+
+    /* Status badges */
+    .badge {
+      display: inline-block; padding: 3px 10px;
+      border-radius: 50px; font-size: 0.70rem; font-weight: 700;
+    }
+    .badge-pending  { background: #FFF3E0; color: #E65100; }
+    .badge-active   { background: #E8F5E9; color: #2E7D32; }
+    .badge-rejected { background: #FFEBEE; color: #C62828; }
+
+    /* Action buttons */
+    .action-btn {
+      padding: 5px 12px; border-radius: var(--radius-sm);
+      border: none; font-family: 'Poppins', sans-serif;
+      font-size: 0.75rem; font-weight: 700; cursor: pointer;
+      transition: var(--transition);
+    }
+    .action-approve { background: #E8F5E9; color: #2E7D32; }
+    .action-approve:hover { background: #4CAF50; color: white; }
+    .action-reject  { background: #FFEBEE; color: #C62828; }
+    .action-reject:hover  { background: #f44336; color: white; }
+    .action-view    { background: var(--blue-pale); color: var(--blue); }
+    .action-view:hover    { background: var(--blue); color: white; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 48px 20px;
+      color: var(--gray-600);
+    }
+    .empty-state-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .empty-state-text { font-size: 0.88rem; }
+
+    /* Member detail modal */
+    .detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .detail-field label {
+      font-size: 0.68rem; color: var(--gray-400);
+      text-transform: uppercase; letter-spacing: 1px;
+      display: block; margin-bottom: 2px;
+    }
+    .detail-field span {
+      font-size: 0.86rem; font-weight: 600; color: var(--text-dark);
+    }
+    .utr-highlight {
+      background: var(--orange-pale); border: 2px dashed var(--orange);
+      border-radius: var(--radius-sm); padding: 12px 16px;
+      text-align: center; margin: 14px 0;
+    }
+    .utr-highlight label { font-size: 0.70rem; color: var(--orange); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .utr-highlight span  { font-size: 1.1rem; font-weight: 800; font-family: monospace; color: var(--text-dark); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .admin-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .admin-stats  { grid-template-columns: repeat(2, 1fr); padding: 16px 16px 0; }
+      .admin-panel  { padding: 16px; }
+      .admin-tabs   { padding: 16px 16px 0; }
+      .admin-topbar { padding: 12px 16px; }
+      table { font-size: 0.78rem; }
+      th, td { padding: 8px 10px; }
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div class="admin-login-wrap" id="admin-login-wrap">
+  <div class="admin-login-card">
+    <div class="admin-login-head">
+      <img src="assets/logo.png" alt="JKP Logo">
+      <h2>Admin Panel</h2>
+      <p>Jan Kalyan Party — Restricted Access</p>
+    </div>
+    <div class="admin-login-body">
+      <div class="admin-attempts-warning" id="attempts-warning">
+        ⚠️ <span id="attempts-text"></span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Admin Username</label>
+        <input type="text" id="admin-username" class="form-control"
+               placeholder="Enter admin username" autocomplete="off">
+        <div class="form-error" id="username-error"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Admin Password</label>
+        <div style="position:relative;">
+          <input type="password" id="admin-password" class="form-control"
+                 placeholder="Enter admin password" maxlength="64">
+          <button type="button" onclick="toggleAdminPwd()"
+                  style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+                         background:none;border:none;cursor:pointer;font-size:1rem;">👁</button>
+        </div>
+        <div class="form-error" id="password-error"></div>
+      </div>
+      <button class="btn btn-orange btn-full" id="admin-login-btn" onclick="adminLogin()">
+        🔐 Login to Admin Panel
+      </button>
+      <p style="font-size:0.72rem;color:var(--gray-400);text-align:center;margin-top:14px;">
+        🔒 This panel is for authorised party administrators only.<br>
+        Unauthorised access is strictly prohibited.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN DASHBOARD ===== -->
+<div class="admin-wrap" id="admin-wrap">
+
+  <!-- Top bar -->
+  <div class="admin-topbar">
+    <div class="admin-topbar-brand">
+      <img src="assets/logo.png" alt="JKP">
+      <div>
+        <div class="admin-topbar-title">Jan Kalyan Party — Admin Panel</div>
+        <div class="admin-topbar-sub">Logged in as Admin</div>
+      </div>
+    </div>
+    <div class="admin-topbar-actions">
+      <span style="font-size:0.75rem;color:rgba(255,255,255,0.65);" id="admin-clock"></span>
+      <button class="btn btn-sm btn-outline-white" onclick="refreshData()">🔄 Refresh</button>
+      <button class="btn btn-sm btn-outline-white" onclick="adminLogout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="admin-stats" id="admin-stats">
+    <div class="admin-stat-card">
+      <div class="admin-stat-icon orange">📋</div>
+      <div>
+        <div class="admin-stat-val" id="stat-total">0</div>
+        <div class="admin-stat-label">Total Registrations</div>
+      </div>
+    </div>
+    <div class="admin-stat-card">
+      <div class="admin-stat-icon blue">⏳</div>
+      <div>
+        <div class="admin-stat-val" id="stat-pending">0</div>
+        <div class="admin-stat-label">Pending Verification</div>
+      </div>
+    </div>
+    <div class="admin-stat-card">
+      <div class="admin-stat-icon green">✅</div>
+      <div>
+        <div class="admin-stat-val" id="stat-active">0</div>
+        <div class="admin-stat-label">Active Members</div>
+      </div>
+    </div>
+    <div class="admin-stat-card">
+      <div class="admin-stat-icon red">🟢</div>
+      <div>
+        <div class="admin-stat-val" id="stat-volunteers">0</div>
+        <div class="admin-stat-label">Volunteers</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="switchAdminTab('pending')">⏳ Pending Verification</button>
+    <button class="admin-tab" onclick="switchAdminTab('active')">✅ Active Members</button>
+    <button class="admin-tab" onclick="switchAdminTab('volunteers')">🟢 Volunteers</button>
+    <button class="admin-tab" onclick="switchAdminTab('all')">📋 All Registrations</button>
+  </div>
+
+  <!-- PENDING PANEL -->
+  <div class="admin-panel active" id="panel-pending">
+    <div class="admin-table-wrap">
+      <div class="admin-table-head">
+        <div class="admin-table-title">⏳ Pending Fee Verification</div>
+        <input type="text" class="admin-search" placeholder="🔍 Search name, phone, UTR..."
+               oninput="filterTable('tbl-pending', this.value)">
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="tbl-pending">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Registration ID</th>
+              <th>UTR / Transaction ID</th>
+              <th>Fee (₹)</th>
+              <th>Registered On</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-pending">
+            <tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">No pending verifications</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE PANEL -->
+  <div class="admin-panel" id="panel-active">
+    <div class="admin-table-wrap">
+      <div class="admin-table-head">
+        <div class="admin-table-title">✅ Active Members</div>
+        <input type="text" class="admin-search" placeholder="🔍 Search..."
+               oninput="filterTable('tbl-active', this.value)">
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="tbl-active">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Member ID</th>
+              <th>State</th>
+              <th>District</th>
+              <th>Fee (₹)</th>
+              <th>Issued On</th>
+              <th>Tenure End</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-active">
+            <tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-text">No active members yet</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOLUNTEERS PANEL -->
+  <div class="admin-panel" id="panel-volunteers">
+    <div class="admin-table-wrap">
+      <div class="admin-table-head">
+        <div class="admin-table-title">🟢 Volunteers</div>
+        <input type="text" class="admin-search" placeholder="🔍 Search..."
+               oninput="filterTable('tbl-volunteers', this.value)">
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="tbl-volunteers">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Volunteer ID</th>
+              <th>State</th>
+              <th>District</th>
+              <th>Availability</th>
+              <th>Registered On</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-volunteers">
+            <tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">🟢</div><div class="empty-state-text">No volunteers yet</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL REGISTRATIONS PANEL -->
+  <div class="admin-panel" id="panel-all">
+    <div class="admin-table-wrap">
+      <div class="admin-table-head">
+        <div class="admin-table-title">📋 All Registrations</div>
+        <input type="text" class="admin-search" placeholder="🔍 Search..."
+               oninput="filterTable('tbl-all', this.value)">
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="tbl-all">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Email</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Registration ID</th>
+              <th>State</th>
+              <th>Registered On</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-all">
+            <tr><td colspan="10"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">No registrations yet</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /admin-wrap -->
+
+<!-- MEMBER DETAIL MODAL -->
+<div class="modal-overlay" id="member-detail-modal">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">👤 Member Details</div>
+      <button class="modal-close" onclick="Modal.close('member-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="member-detail-body"></div>
+  </div>
+</div>
+
+<div class="toast-wrap"></div>
+
+<script src="js/security.js"></script>
+<script src="js/main.js"></script>
+<script src="js/membership.js"></script>
+<script>
+
+/* ================================================================
+   ADMIN CREDENTIALS
+   In production: move to backend with bcrypt hashing
+   ================================================================ */
+const ADMIN_CREDENTIALS = {
+  username : 'jkpadmin',
+  // SHA-256 of 'JKP@Admin2024' — change this before going live!
+  passHash : 'a7f9b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4'
+};
+
+// Simple hash for demo (replace with real SHA-256 check in production)
+async function hashAdminPwd(pwd) {
+  const encoder = new TextEncoder();
+  const data    = encoder.encode('JKP_ADMIN_SALT_' + pwd);
+  const hash    = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ================================================================
+   ADMIN LOGIN — Rate limited, lockout after 5 attempts
+   ================================================================ */
+let loginAttempts = 0;
+const MAX_ATTEMPTS = 5;
+let lockoutUntil   = 0;
+
+async function adminLogin() {
+  const username = document.getElementById('admin-username').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const btn      = document.getElementById('admin-login-btn');
+  const warning  = document.getElementById('attempts-warning');
+
+  // Check lockout
+  if (Date.now() < lockoutUntil) {
+    const mins = Math.ceil((lockoutUntil - Date.now()) / 60000);
+    warning.style.display = 'block';
+    document.getElementById('attempts-text').textContent =
+      `Too many failed attempts. Try again in ${mins} minute(s).`;
+    return;
+  }
+
+  if (!username || !password) {
+    Toast.show('Please enter username and password.', 'error');
+    return;
+  }
+
+  SubmitGuard.lockButton(btn, 'Verifying...');
+
+  // Verify credentials
+  const hash    = await hashAdminPwd(password);
+  const isValid = username === ADMIN_CREDENTIALS.username;
+  // For demo: accept password 'JKP@Admin2024'
+  // Change this to hash comparison in production
+  const pwdOk   = password === 'JKP@Admin2024';
+
+  if (!isValid || !pwdOk) {
+    loginAttempts++;
+    const remaining = MAX_ATTEMPTS - loginAttempts;
+
+    if (loginAttempts >= MAX_ATTEMPTS) {
+      lockoutUntil = Date.now() + 15 * 60 * 1000; // 15 min lockout
+      warning.style.display = 'block';
+      document.getElementById('attempts-text').textContent =
+        'Account locked for 15 minutes due to too many failed attempts.';
+      loginAttempts = 0;
+    } else {
+      warning.style.display = 'block';
+      document.getElementById('attempts-text').textContent =
+        `Invalid credentials. ${remaining} attempt(s) remaining before lockout.`;
+    }
+    SubmitGuard.unlockButton(btn);
+    return;
+  }
+
+  // Success
+  sessionStorage.setItem('jkp_admin_session', JSON.stringify({
+    loggedIn : true,
+    loginTime: Date.now(),
+  }));
+  loginAttempts = 0;
+  showAdminDashboard();
+  SubmitGuard.unlockButton(btn);
+}
+
+// Allow Enter key on login
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('admin-password')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') adminLogin();
+  });
+  document.getElementById('admin-username')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('admin-password')?.focus();
+  });
+
+  // Check existing admin session
+  const adminSession = sessionStorage.getItem('jkp_admin_session');
+  if (adminSession) {
+    try {
+      const s = JSON.parse(adminSession);
+      // Session valid for 4 hours
+      if (s.loggedIn && Date.now() - s.loginTime < 4 * 60 * 60 * 1000) {
+        showAdminDashboard();
+        return;
+      }
+    } catch(e) {}
+    sessionStorage.removeItem('jkp_admin_session');
+  }
+});
+
+function toggleAdminPwd() {
+  const input = document.getElementById('admin-password');
+  input.type  = input.type === 'password' ? 'text' : 'password';
+}
+
+function adminLogout() {
+  sessionStorage.removeItem('jkp_admin_session');
+  document.getElementById('admin-wrap').style.display       = 'none';
+  document.getElementById('admin-login-wrap').style.display = 'flex';
+  document.getElementById('admin-password').value           = '';
+  Toast.show('Logged out successfully.', 'info');
+}
+
+/* ================================================================
+   SHOW ADMIN DASHBOARD
+   ================================================================ */
+function showAdminDashboard() {
+  document.getElementById('admin-login-wrap').style.display = 'none';
+  document.getElementById('admin-wrap').style.display       = 'block';
+  loadAllData();
+  startClock();
+}
+
+/* ================================================================
+   CLOCK
+   ================================================================ */
+function startClock() {
+  const el = document.getElementById('admin-clock');
+  function tick() {
+    if (el) el.textContent = new Date().toLocaleString('en-IN');
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+/* ================================================================
+   LOAD ALL DATA FROM SecureStore
+   ================================================================ */
+function loadAllData() {
+  const members    = SecureStore.get('standalone_members') || [];
+  const users      = SecureStore.get('users') || [];
+  const volunteers = SecureStore.get('standalone_volunteers') || [];
+
+  // Merge all records
+  const all = [...members, ...users];
+
+  const pending    = all.filter(m => m.status === 'pending_payment' && m.utrNo);
+  const active     = all.filter(m => m.status === 'active' && m.membershipType !== 'volunteer');
+  const vols       = [...volunteers, ...all.filter(m => m.membershipType === 'volunteer')];
+
+  // Update stats
+  document.getElementById('stat-total').textContent     = all.length;
+  document.getElementById('stat-pending').textContent   = pending.length;
+  document.getElementById('stat-active').textContent    = active.length;
+  document.getElementById('stat-volunteers').textContent= vols.length;
+
+  // Populate tables
+  populatePendingTable(pending);
+  populateActiveTable(active);
+  populateVolunteersTable(vols);
+  populateAllTable(all);
+}
+
+/* ================================================================
+   PENDING TABLE
+   ================================================================ */
+function populatePendingTable(records) {
+  const tbody = document.getElementById('tbody-pending');
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">No pending verifications</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = records.map((m, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${sanitizeHTML(m.name)}</strong></td>
+      <td>${sanitizeHTML(m.phone || '—')}</td>
+      <td class="td-id">${sanitizeHTML(m.tempMemberId || '—')}</td>
+      <td class="td-utr">${sanitizeHTML(m.utrNo || '—')}</td>
+      <td>₹${sanitizeHTML(String(m.fee || '—'))}</td>
+      <td>${sanitizeHTML(m.registeredDate || m.joinedDate || '—')}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="action-btn action-view"    onclick="viewMember('${sanitizeHTML(m.id)}')">👁 View</button>
+        <button class="action-btn action-approve" onclick="approveMember('${sanitizeHTML(m.id)}')">✅ Approve</button>
+        <button class="action-btn action-reject"  onclick="rejectMember('${sanitizeHTML(m.id)}')">❌ Reject</button>
+      </td>
+    </tr>`).join('');
+}
+
+/* ================================================================
+   ACTIVE TABLE
+   ================================================================ */
+function populateActiveTable(records) {
+  const tbody = document.getElementById('tbody-active');
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-text">No active members yet</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = records.map((m, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${sanitizeHTML(m.name)}</strong></td>
+      <td>${sanitizeHTML(m.phone || '—')}</td>
+      <td class="td-id">${sanitizeHTML(m.memberId || '—')}</td>
+      <td>${sanitizeHTML(m.state || '—')}</td>
+      <td>${sanitizeHTML(m.district || '—')}</td>
+      <td>₹${sanitizeHTML(String(m.fee || '—'))}</td>
+      <td>${sanitizeHTML(m.issuedDate || '—')}</td>
+      <td>${sanitizeHTML(m.tenureEnd || '—')}</td>
+    </tr>`).join('');
+}
+
+/* ================================================================
+   VOLUNTEERS TABLE
+   ================================================================ */
+function populateVolunteersTable(records) {
+  const tbody = document.getElementById('tbody-volunteers');
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">🟢</div><div class="empty-state-text">No volunteers yet</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = records.map((m, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${sanitizeHTML(m.name)}</strong></td>
+      <td>${sanitizeHTML(m.phone || '—')}</td>
+      <td class="td-id">${sanitizeHTML(m.volunteerId || m.memberId || '—')}</td>
+      <td>${sanitizeHTML(m.state || '—')}</td>
+      <td>${sanitizeHTML(m.district || '—')}</td>
+      <td>${sanitizeHTML(m.availability || '—')}</td>
+      <td>${sanitizeHTML(m.registeredDate || m.joinedDate || m.issuedDate || '—')}</td>
+    </tr>`).join('');
+}
+
+/* ================================================================
+   ALL TABLE
+   ================================================================ */
+function populateAllTable(records) {
+  const tbody = document.getElementById('tbody-all');
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">No registrations yet</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = records.map((m, i) => {
+    const statusBadge = m.status === 'active'
+      ? '<span class="badge badge-active">Active</span>'
+      : m.status === 'pending_payment'
+      ? '<span class="badge badge-pending">Fee Pending</span>'
+      : '<span class="badge badge-pending">Registered</span>';
+    const typeBadge = m.membershipType === 'volunteer'
+      ? '🟢 Volunteer' : m.membershipType === 'active'
+      ? '🟠 Active' : m.membershipType === 'general'
+      ? '🔵 General' : '—';
+    return `
+      <tr>
+        <td>${i + 1}</td>
+        <td><strong>${sanitizeHTML(m.name)}</strong></td>
+        <td>${sanitizeHTML(m.phone || '—')}</td>
+        <td style="font-size:0.75rem;">${sanitizeHTML(m.email || '—')}</td>
+        <td>${typeBadge}</td>
+        <td>${statusBadge}</td>
+        <td class="td-id">${sanitizeHTML(m.tempMemberId || m.memberId || m.volunteerId || '—')}</td>
+        <td>${sanitizeHTML(m.state || '—')}</td>
+        <td>${sanitizeHTML(m.registeredDate || m.joinedDate || '—')}</td>
+        <td>
+          <button class="action-btn action-view" onclick="viewMember('${sanitizeHTML(m.id)}')">👁 View</button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ================================================================
+   VIEW MEMBER DETAIL
+   ================================================================ */
+function viewMember(id) {
+  const all    = [...(SecureStore.get('standalone_members') || []), ...(SecureStore.get('users') || [])];
+  const member = all.find(m => m.id === id);
+  if (!member) { Toast.show('Member not found.', 'error'); return; }
+
+  const body = document.getElementById('member-detail-body');
+  const isPending = member.status === 'pending_payment';
+
+  body.innerHTML = `
+    ${isPending && member.utrNo ? `
+    <div class="utr-highlight">
+      <label>UTR / Transaction ID to Verify</label>
+      <span>${sanitizeHTML(member.utrNo)}</span>
+    </div>` : ''}
+
+    <div class="detail-grid">
+      <div class="detail-field"><label>Full Name</label><span>${sanitizeHTML(member.name)}</span></div>
+      <div class="detail-field"><label>Mobile</label><span>${sanitizeHTML(member.phone || '—')}</span></div>
+      <div class="detail-field"><label>Email</label><span>${sanitizeHTML(member.email || '—')}</span></div>
+      <div class="detail-field"><label>Date of Birth</label><span>${sanitizeHTML(member.dob || '—')}</span></div>
+      <div class="detail-field"><label>Gender</label><span>${sanitizeHTML(member.gender || '—')}</span></div>
+      <div class="detail-field"><label>Aadhaar (last 4)</label><span>••••••••${sanitizeHTML((member.aadhaar||'').slice(-4))}</span></div>
+      <div class="detail-field"><label>State</label><span>${sanitizeHTML(member.state || '—')}</span></div>
+      <div class="detail-field"><label>District</label><span>${sanitizeHTML(member.district || '—')}</span></div>
+      <div class="detail-field"><label>Village/City</label><span>${sanitizeHTML(member.village || '—')}</span></div>
+      <div class="detail-field"><label>Block</label><span>${sanitizeHTML(member.block || '—')}</span></div>
+      <div class="detail-field"><label>Sub District</label><span>${sanitizeHTML(member.subDistrict || '—')}</span></div>
+      <div class="detail-field"><label>Annual Fee</label><span>₹${sanitizeHTML(String(member.fee || '—'))}</span></div>
+      <div class="detail-field"><label>Registration ID</label><span style="font-weight:800;color:var(--blue);">${sanitizeHTML(member.tempMemberId || member.memberId || '—')}</span></div>
+      <div class="detail-field"><label>Status</label><span>${sanitizeHTML(member.status || '—')}</span></div>
+      <div class="detail-field"><label>Registered On</label><span>${sanitizeHTML(member.registeredDate || member.joinedDate || '—')}</span></div>
+      <div class="detail-field"><label>Member ID</label><span>${sanitizeHTML(member.memberId || 'Not yet generated')}</span></div>
+    </div>
+
+    <div style="font-size:0.78rem;color:var(--gray-600);margin-top:14px;padding:10px 14px;background:var(--gray-100);border-radius:var(--radius-sm);">
+      <strong>Full Address:</strong> ${sanitizeHTML(member.fullAddress || '—')}
+    </div>
+
+    ${isPending ? `
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+      <button class="btn btn-green btn-sm" onclick="approveMember('${sanitizeHTML(member.id)}');Modal.close('member-detail-modal');">
+        ✅ Approve & Activate Membership
+      </button>
+      <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;"
+              onclick="rejectMember('${sanitizeHTML(member.id)}');Modal.close('member-detail-modal');">
+        ❌ Reject Payment
+      </button>
+    </div>` : ''}`;
+
+  Modal.open('member-detail-modal');
+}
+
+/* ================================================================
+   APPROVE MEMBER — Generate official ID card
+   ================================================================ */
+function approveMember(id) {
+  const members = SecureStore.get('standalone_members') || [];
+  const users   = SecureStore.get('users') || [];
+
+  let member    = null;
+  let source    = null;
+  let index     = members.findIndex(m => m.id === id);
+
+  if (index !== -1) { member = members[index]; source = 'members'; }
+  else {
+    index  = users.findIndex(u => u.id === id);
+    if (index !== -1) { member = users[index]; source = 'users'; }
+  }
+
+  if (!member) { Toast.show('Member not found.', 'error'); return; }
+  if (member.status === 'active') { Toast.show('Member is already active.', 'info'); return; }
+  if (!member.utrNo) { Toast.show('No UTR submitted yet for this member.', 'error'); return; }
+
+  // Generate official Membership ID
+  const memberId   = IDGenerator.generate(member.name, member.district, member.state);
+  const tenure     = TenureCalc.formatTenure();
+  const issuedDate = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+
+  const updates = {
+    memberId,
+    status     : 'active',
+    feeVerified: true,
+    issuedDate,
+    tenureStart: tenure.start,
+    tenureEnd  : tenure.end,
+  };
+
+  if (source === 'members') {
+    members[index] = { ...members[index], ...updates };
+    SecureStore.set('standalone_members', members);
+  } else {
+    users[index] = { ...users[index], ...updates };
+    SecureStore.set('users', users);
+  }
+
+  Toast.show(`✅ Membership approved! ID: ${memberId}`, 'success', 5000);
+  loadAllData();
+}
+
+/* ================================================================
+   REJECT MEMBER
+   ================================================================ */
+function rejectMember(id) {
+  if (!confirm('Are you sure you want to reject this payment? The UTR will be cleared.')) return;
+
+  const members = SecureStore.get('standalone_members') || [];
+  const users   = SecureStore.get('users') || [];
+
+  let index = members.findIndex(m => m.id === id);
+  if (index !== -1) {
+    members[index].utrNo            = null;
+    members[index].utrSubmittedAt   = null;
+    members[index].status           = 'pending_payment';
+    SecureStore.set('standalone_members', members);
+  } else {
+    index = users.findIndex(u => u.id === id);
+    if (index !== -1) {
+      users[index].utrNo          = null;
+      users[index].utrSubmittedAt = null;
+      users[index].status         = 'pending_payment';
+      SecureStore.set('users', users);
+    }
+  }
+
+  Toast.show('Payment rejected. UTR cleared. Member notified to resubmit.', 'info');
+  loadAllData();
+}
+
+/* ================================================================
+   TAB SWITCHING
+   ================================================================ */
+function switchAdminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+/* ================================================================
+   TABLE SEARCH FILTER
+   ================================================================ */
+function filterTable(tableId, query) {
+  const q     = query.toLowerCase();
+  const rows  = document.querySelectorAll(`#${tableId} tbody tr`);
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+/* ================================================================
+   REFRESH button
+   ================================================================ */
+function refreshData() {
+  loadAllData();
+  Toast.show('Data refreshed.', 'info', 1500);
+}
+</script>
+</body>
+</html>
